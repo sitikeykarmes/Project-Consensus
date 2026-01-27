@@ -215,7 +215,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str)
             }, room_id)
             
             # Check if any agents are in this group
-            if room_id in groups_db:
+            if orchestrator and room_id in groups_db:
                 group = groups_db[room_id]
                 if group["agents"]:
                     # Process through orchestrator
