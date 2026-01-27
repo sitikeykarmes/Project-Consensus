@@ -166,13 +166,19 @@ def get_available_agents():
 @app.post("/api/query", response_model=ConsensusOutput)
 async def process_query(request: QueryRequest):
     """Process user query through orchestration"""
-    result = orchestrator.execute_query(request.message)
-    
-    return ConsensusOutput(
-        final_answer=result["final_answer"],
-        mode_used=result["mode_used"],
-        agent_responses=result["agent_responses"]
-    )
+    if orchestrator:
+        result = orchestrator.execute_query(request.message)
+        return ConsensusOutput(
+            final_answer=result["final_answer"],
+            mode_used=result["mode_used"],
+            agent_responses=result["agent_responses"]
+        )
+    else:
+        return ConsensusOutput(
+            final_answer="AI agents are not available at the moment.",
+            mode_used="none",
+            agent_responses=[]
+        )
 
 @app.websocket("/ws/{room_id}/{user_name}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str):
