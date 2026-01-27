@@ -1,12 +1,30 @@
 import { useEffect, useRef, useState } from "react";
+import Sidebar from "../components/Sidebar";
+import TopBar from "../components/TopBar";
+import ChatWindow from "../components/ChatWindow";
 
 export default function ChatRoom() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   const roomId = "room1";
-  const userName = "Kartikey"; // you can make it dynamic later
+  const userName = "Kartikey";
+
+  // AI Agents list
+  const agents = ["Research Agent", "Analysis Agent", "Synthesis Agent"];
+
+  // Auto-scroll to bottom
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     const ws = new WebSocket(`ws://localhost:8000/ws/${roomId}/${userName}`);
@@ -14,23 +32,38 @@ export default function ChatRoom() {
 
     ws.onopen = () => {
       console.log("✅ Connected to WebSocket");
+      setIsConnected(true);
     };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      
+      // Handle user joined/left to update online users
+      if (data.type === "user_joined") {
+        setOnlineUsers(prev => [...new Set([...prev, data.user_name])]);
+      }
+      if (data.type === "user_left") {
+        setOnlineUsers(prev => prev.filter(u => u !== data.user_name));
+      }
 
       setMessages((prev) => [...prev, data]);
     };
 
     ws.onclose = () => {
       console.log("❌ WebSocket disconnected");
+      setIsConnected(false);
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setIsConnected(false);
     };
 
     return () => ws.close();
   }, []);
 
   const sendMessage = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !isConnected) return;
 
     wsRef.current.send(
       JSON.stringify({
@@ -41,82 +74,50 @@ export default function ChatRoom() {
     setInput("");
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-950 text-white">
-      <div className="w-full max-w-3xl bg-blue-900 rounded-xl p-6 shadow-lg">
-        <h1 className="text-2xl font-bold text-center mb-4">
-          🧠 Project Consensus Chat
-        </h1>
+    <div className="flex h-screen bg-slate-900 text-white" data-testid="chat-room">
+      {/* Sidebar */}
+      <Sidebar users={onlineUsers} agents={agents} currentUser={userName} />
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
+        <TopBar roomName="Project Consensus Chat" isConnected={isConnected} onlineCount={onlineUsers.length} />
 
         {/* Chat Messages */}
-        <div className="h-96 overflow-y-auto bg-blue-800 rounded-lg p-4 space-y-3">
-          {messages.map((msg, index) => {
-            if (msg.type === "user_message") {
-              return (
-                <div key={index} className="text-right">
-                  <div className="inline-block bg-green-600 px-3 py-2 rounded-lg">
-                    <b>{msg.user_name}:</b> {msg.content}
-                  </div>
-                </div>
-              );
-            }
-
-            if (msg.type === "agent_response") {
-              return (
-                <div key={index} className="text-left">
-                  <div className="inline-block bg-purple-600 px-3 py-2 rounded-lg">
-                    🤖 <b>{msg.agent_name}</b>: {msg.content}
-                  </div>
-                </div>
-              );
-            }
-
-            if (msg.type === "consensus") {
-              return (
-                <div key={index} className="text-center">
-                  <div className="inline-block bg-yellow-600 text-black px-4 py-2 rounded-lg font-semibold">
-                    ✅ Consensus: {msg.content}
-                  </div>
-                </div>
-              );
-            }
-
-            if (msg.type === "user_joined") {
-              return (
-                <div key={index} className="text-center text-gray-300">
-                  👤 {msg.user_name} joined the room
-                </div>
-              );
-            }
-
-            if (msg.type === "user_left") {
-              return (
-                <div key={index} className="text-center text-gray-300">
-                  👤 {msg.user_name} left the room
-                </div>
-              );
-            }
-
-            return null;
-          })}
-        </div>
+        <ChatWindow messages={messages} currentUser={userName} messagesEndRef={messagesEndRef} />
 
         {/* Input Box */}
-        <div className="flex gap-2 mt-4">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            placeholder="Ask something..."
-            className="flex-1 px-4 py-2 rounded-lg bg-blue-700 text-white outline-none"
-          />
-          <button
-            onClick={sendMessage}
-            className="px-5 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-semibold"
-          >
-            Send
-          </button>
+        <div className="bg-slate-800 border-t border-slate-700 p-4">
+          <div className="flex gap-3 max-w-6xl mx-auto">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message..."
+              className="flex-1 px-4 py-3 rounded-lg bg-slate-700 text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              disabled={!isConnected}
+              data-testid="message-input"
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!isConnected || !input.trim()}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed rounded-lg font-semibold transition-all transform hover:scale-105 active:scale-95"
+              data-testid="send-button"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
