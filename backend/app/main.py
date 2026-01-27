@@ -65,7 +65,13 @@ class ConnectionManager:
         return [conn["user_name"] for conn in self.active_connections[room_id]]
 
 manager = ConnectionManager()
-orchestrator = Orchestrator()
+
+# Initialize orchestrator (optional, for AI agents)
+try:
+    orchestrator = Orchestrator()
+except Exception as e:
+    print(f"Warning: Could not initialize orchestrator: {e}")
+    orchestrator = None
 
 # Initialize default groups
 def initialize_default_groups():
