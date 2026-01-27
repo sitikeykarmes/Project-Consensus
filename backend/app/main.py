@@ -1,6 +1,8 @@
 #backend/app/main.py
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from app.models.schemas import QueryRequest, ConsensusOutput
+from app.agents.orchestrator import Orchestrator
 from typing import Dict, List
 import json
 from datetime import datetime
@@ -44,48 +46,22 @@ class ConnectionManager:
                     pass
 
 manager = ConnectionManager()
-
-# Mock orchestrator for UI demonstration
-class MockOrchestrator:
-    def execute_query(self, message: str):
-        return {
-            "final_answer": f"Consensus reached: {message[:50]}...",
-            "mode_used": "support",
-            "agent_responses": [
-                {
-                    "agent_name": "Research Agent",
-                    "content": f"Analyzing query: {message}",
-                    "mode": "support"
-                },
-                {
-                    "agent_name": "Analysis Agent",
-                    "content": "Providing detailed analysis based on available data.",
-                    "mode": "support"
-                },
-                {
-                    "agent_name": "Synthesis Agent",
-                    "content": "Synthesizing insights from multiple perspectives.",
-                    "mode": "support"
-                }
-            ]
-        }
-
-orchestrator = MockOrchestrator()
+orchestrator = Orchestrator()
 
 @app.get("/")
 def read_root():
     return {"message": "Project Consensus API is running", "status": "active"}
 
-@app.post("/api/query")
-async def process_query(message: str):
+@app.post("/api/query", response_model=ConsensusOutput)
+async def process_query(request: QueryRequest):
     """Process user query through orchestration"""
-    result = orchestrator.execute_query(message)
+    result = orchestrator.execute_query(request.message)
     
-    return {
-        "final_answer": result["final_answer"],
-        "mode_used": result["mode_used"],
-        "agent_responses": result["agent_responses"]
-    }
+    return ConsensusOutput(
+        final_answer=result["final_answer"],
+        mode_used=result["mode_used"],
+        agent_responses=result["agent_responses"]
+    )
 
 @app.websocket("/ws/{room_id}/{user_name}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str):
