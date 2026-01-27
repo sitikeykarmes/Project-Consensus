@@ -27,7 +27,7 @@ export default function ChatRoom() {
   }, [messages]);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:8000/ws/${roomId}/${userName}`);
+    const ws = new WebSocket(`ws://localhost:8001/ws/${roomId}/${userName}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
