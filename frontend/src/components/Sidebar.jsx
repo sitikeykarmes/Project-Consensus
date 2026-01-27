@@ -1,101 +1,116 @@
-export default function Sidebar({ users, agents, currentUser }) {
-  // Generate avatar color based on name
-  const getAvatarColor = (name) => {
-    const colors = [
-      'bg-blue-500',
-      'bg-green-500',
-      'bg-purple-500',
-      'bg-pink-500',
-      'bg-yellow-500',
-      'bg-red-500',
-      'bg-indigo-500',
-      'bg-teal-500'
-    ];
-    const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  };
+import { Search, MessageCircle, MoreVertical, Plus } from 'lucide-react';
 
-  const getInitials = (name) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+export default function Sidebar({ groups, selectedGroup, onGroupSelect, onCreateGroup, currentUser }) {
+  const formatTime = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    } else if (diffDays === 1) {
+      return 'Yesterday';
+    } else if (diffDays < 7) {
+      return date.toLocaleDateString('en-US', { weekday: 'short' });
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
   };
 
   return (
-    <div className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col" data-testid="sidebar">
-      {/* Sidebar Header */}
-      <div className="p-4 border-b border-slate-700">
-        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-          <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-          </svg>
-          Group Chat
-        </h2>
+    <div className="w-[420px] flex flex-col bg-white border-r border-gray-200" data-testid="sidebar">
+      {/* Header */}
+      <div className="bg-[#F0F2F5] px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-teal-400 flex items-center justify-center text-white font-semibold">
+            {currentUser[0].toUpperCase()}
+          </div>
+          <span className="font-medium text-gray-800">{currentUser}</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button className="text-gray-600 hover:text-gray-800 transition-colors" title="New Chat">
+            <MessageCircle size={20} />
+          </button>
+          <button className="text-gray-600 hover:text-gray-800 transition-colors" title="Menu">
+            <MoreVertical size={20} />
+          </button>
+        </div>
       </div>
 
-      {/* Users Section */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
-          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-            Online - {users.length}
-          </h3>
-          <div className="space-y-2">
-            {users.length === 0 ? (
-              <div className="text-sm text-slate-500 italic">No users online</div>
-            ) : (
-              users.map((user, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 transition-colors cursor-pointer"
-                  data-testid={`user-${user}`}
-                >
-                  <div className="relative">
-                    <div className={`w-10 h-10 rounded-full ${getAvatarColor(user)} flex items-center justify-center font-semibold text-white`}>
-                      {getInitials(user)}
-                    </div>
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-800 rounded-full"></div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-white truncate">
-                      {user}
-                      {user === currentUser && (
-                        <span className="ml-1 text-xs text-slate-400">(You)</span>
-                      )}
-                    </div>
-                    <div className="text-xs text-green-500">Online</div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+      {/* Search */}
+      <div className="px-3 py-2 bg-white border-b border-gray-200">
+        <div className="bg-[#F0F2F5] rounded-lg px-4 py-2 flex items-center gap-3">
+          <Search size={18} className="text-gray-500" />
+          <input 
+            type="text" 
+            placeholder="Search or start new chat"
+            className="bg-transparent flex-1 outline-none text-sm text-gray-700 placeholder-gray-500"
+          />
         </div>
+      </div>
 
-        {/* AI Agents Section */}
-        <div className="p-4 border-t border-slate-700">
-          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            AI Agents
-          </h3>
-          <div className="space-y-2">
-            {agents.map((agent, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 transition-colors"
-                data-testid={`agent-${agent}`}
-              >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
+      {/* Create Group Button */}
+      <div className="px-3 py-2 bg-white border-b border-gray-200">
+        <button
+          onClick={onCreateGroup}
+          className="w-full bg-gradient-to-r from-purple-500 to-teal-500 text-white px-4 py-2.5 rounded-lg font-medium hover:from-purple-600 hover:to-teal-600 transition-all flex items-center justify-center gap-2 shadow-md"
+          data-testid="create-group-button"
+        >
+          <Plus size={18} />
+          Create New Group
+        </button>
+      </div>
+
+      {/* Groups List */}
+      <div className="flex-1 overflow-y-auto bg-white" data-testid="groups-list">
+        {groups.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center px-8 py-12">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <MessageCircle size={40} className="text-gray-400" />
+            </div>
+            <p className="text-gray-600 font-medium mb-2">No groups yet</p>
+            <p className="text-gray-500 text-sm">Create a group to start chatting</p>
+          </div>
+        ) : (
+          groups.map((group) => (
+            <div
+              key={group.id}
+              onClick={() => onGroupSelect(group)}
+              className={`px-4 py-3 flex items-center gap-3 cursor-pointer transition-all border-b border-gray-100 hover:bg-[#F5F5F5] ${
+                selectedGroup?.id === group.id ? 'bg-[#F0F2F5]' : ''
+              }`}
+              data-testid={`group-${group.id}`}
+            >
+              {/* Avatar */}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-teal-400 flex items-center justify-center text-white text-xl flex-shrink-0">
+                {group.avatar || '💬'}
+              </div>
+
+              {/* Group Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-medium text-gray-900 truncate">{group.name}</h3>
+                  <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                    {formatTime(group.last_message_time)}
+                  </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-purple-300 truncate">{agent}</div>
-                  <div className="text-xs text-slate-400">AI Assistant</div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600 truncate">
+                    {group.last_message || 'No messages yet'}
+                  </p>
+                  {group.agents && group.agents.length > 0 && (
+                    <div className="ml-2 flex-shrink-0">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                        🤖 {group.agents.length}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
