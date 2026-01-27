@@ -1,8 +1,6 @@
 #backend/app/main.py
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from app.models.schemas import QueryRequest, ConsensusOutput
-from app.agents.orchestrator import Orchestrator
 from typing import Dict, List
 import json
 from datetime import datetime
@@ -46,7 +44,33 @@ class ConnectionManager:
                     pass
 
 manager = ConnectionManager()
-orchestrator = Orchestrator()
+
+# Mock orchestrator for UI demonstration
+class MockOrchestrator:
+    def execute_query(self, message: str):
+        return {
+            "final_answer": f"Consensus reached: {message[:50]}...",
+            "mode_used": "support",
+            "agent_responses": [
+                {
+                    "agent_name": "Research Agent",
+                    "content": f"Analyzing query: {message}",
+                    "mode": "support"
+                },
+                {
+                    "agent_name": "Analysis Agent",
+                    "content": "Providing detailed analysis based on available data.",
+                    "mode": "support"
+                },
+                {
+                    "agent_name": "Synthesis Agent",
+                    "content": "Synthesizing insights from multiple perspectives.",
+                    "mode": "support"
+                }
+            ]
+        }
+
+orchestrator = MockOrchestrator()
 
 @app.get("/")
 def read_root():
