@@ -1,80 +1,73 @@
-from groq import Groq
-import os
+# backend/app/agents/independent_mode.py
+from app.utils.openrouter_client import OpenRouterClient
 
 class IndependentMode:
     def __init__(self):
-        self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-        self.model = "llama-3.3-70b-versatile"
+        self.client = OpenRouterClient()
     
     def agent_1(self, user_query: str) -> dict:
-        """First independent perspective"""
+        """First independent perspective using Agent 1"""
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "You are Agent 1. Provide your unique perspective on the query. Be opinionated but fair."},
-                    {"role": "user", "content": user_query}
-                ],
-                temperature=0.8,
-                max_tokens=400
-            )
+            messages = [
+                {"role": "system", "content": "You are Agent 1 (Agent 1). Provide your unique perspective on the query. Be opinionated but fair."},
+                {"role": "user", "content": user_query}
+            ]
+            
+            content = self.client.get_completion("agent1", messages, temperature=0.8, max_tokens=400)
+            
             return {
-                "agent_name": "Agent 1",
-                "content": response.choices[0].message.content,
+                "agent_name": "Agent 1 (Agent 1)",
+                "content": content,
                 "mode": "independent"
             }
         except Exception as e:
             return {
-                "agent_name": "Agent 1",
-                "content": f"Error: {e}",
+                "agent_name": "Agent 1 (Agent 1)",
+                "content": f"Error: {str(e)}",
                 "mode": "independent"
             }
     
     def agent_2(self, user_query: str) -> dict:
-        """Second independent perspective"""
+        """Second independent perspective using Agent 2"""
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "You are Agent 2. Provide a different perspective. Emphasize different aspects than Agent 1 would."},
-                    {"role": "user", "content": user_query}
-                ],
-                temperature=0.8,
-                max_tokens=400
-            )
+            messages = [
+                {"role": "system", "content": "You are Agent 2 (Agent 2). Provide a different perspective. Emphasize different aspects than Agent 1 would."},
+                {"role": "user", "content": user_query}
+            ]
+            
+            content = self.client.get_completion("agent2", messages, temperature=0.8, max_tokens=400)
+            
             return {
-                "agent_name": "Agent 2",
-                "content": response.choices[0].message.content,
+                "agent_name": "Agent 2 (Agent 2)",
+                "content": content,
                 "mode": "independent"
             }
         except Exception as e:
             return {
-                "agent_name": "Agent 2",
-                "content": f"Error: {e}",
+                "agent_name": "Agent 2 (Agent 2)",
+                "content": f"Error: {str(e)}",
                 "mode": "independent"
             }
     
     def agent_3(self, user_query: str) -> dict:
-        """Third independent perspective"""
+        """Third independent perspective using Agent 3"""
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "You are Agent 3. Provide yet another unique angle. Consider aspects others might miss."},
-                    {"role": "user", "content": user_query}
-                ],
-                temperature=0.8,
-                max_tokens=400
-            )
+            messages = [
+                {"role": "system", "content": "You are Agent 3 (Agent 3). Provide yet another unique angle. Consider aspects others might miss."},
+                {"role": "user", "content": user_query}
+            ]
+            
+            content = self.client.get_completion("agent3", messages, temperature=0.8, max_tokens=400)
+            
             return {
-                "agent_name": "Agent 3",
-                "content": response.choices[0].message.content,
+                "agent_name": "Agent 3 (Agent 3)",
+                "content": content,
                 "mode": "independent"
             }
         except Exception as e:
             return {
-                "agent_name": "Agent 3",
-                "content": f"Error: {e}",
+                "agent_name": "Agent 3 (Agent 3)",
+                "content": f"Error: {str(e)}",
                 "mode": "independent"
             }
     
@@ -84,17 +77,16 @@ class IndependentMode:
         
         results = []
         
-        # Run agents sequentially
         result1 = self.agent_1(user_query)
-        print(f"✓ Agent 1 completed")
+        print(f"✓ Agent 1 (Agent 1) completed")
         results.append(result1)
         
         result2 = self.agent_2(user_query)
-        print(f"✓ Agent 2 completed")
+        print(f"✓ Agent 2 (Agent 2) completed")
         results.append(result2)
         
         result3 = self.agent_3(user_query)
-        print(f"✓ Agent 3 completed")
+        print(f"✓ Agent 3 (Agent 3) completed")
         results.append(result3)
         
         return {
