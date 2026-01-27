@@ -1,10 +1,9 @@
 # backend/app/agents/independent_mode.py
-from app.utils.openrouter_client import OpenRouterClient
+from app.utils.LLM_agent_client import LLMAgentClient
 
 class IndependentMode:
     def __init__(self):
-        self.client = OpenRouterClient()
-    
+        self.client = LLMAgentClient()
     def agent_1(self, user_query: str) -> dict:
         """First independent perspective using Agent 1"""
         try:

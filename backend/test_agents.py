@@ -1,6 +1,4 @@
-# backend/test_openrouter.py
-
-from app.utils.openrouter_client import OpenRouterClient
+from app.utils.LLM_agent_client import LLMAgentClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -8,16 +6,16 @@ load_dotenv()
 
 def test_all_agents():
     print("=" * 60)
-    print("Testing Multi-Agent System (OpenRouter + Groq)")
+    print("Testing Multi-Agent System (ALL GROQ)")
     print("=" * 60 + "\n")
 
-    client = OpenRouterClient()
+    client = LLMAgentClient()
 
     test_query = "What is artificial intelligence in one sentence?"
 
     agents_to_test = {
         "agent1": "GPT-OSS-120B (Groq)",
-        "agent2": "Llama 3.3 70B (OpenRouter)",
+        "agent2": "Llama 4 scout 17B (Groq)",
         "agent3": "Kimi K2 (Groq)"
     }
 
@@ -80,7 +78,7 @@ def test_all_agents():
     elif successful > 0:
         print(f"\n⚠️  {successful} agent(s) working. System will use fallback for failed agents.\n")
     else:
-        print("\n❌ All agents failed. Check your API keys and internet connection.\n")
+        print("\n❌ All agents failed. Check your API key and internet connection.\n")
 
 
 if __name__ == "__main__":

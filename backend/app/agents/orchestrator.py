@@ -3,7 +3,7 @@ from app.agents.opposition_mode import OppositionMode
 from app.agents.support_mode import SupportMode
 from app.agents.independent_mode import IndependentMode
 from app.utils.intent_classifier import IntentClassifier
-from app.utils.openrouter_client import OpenRouterClient
+from app.utils.LLM_agent_client import LLMAgentClient
 import os
 
 class Orchestrator:
@@ -12,7 +12,7 @@ class Orchestrator:
         self.opposition_mode = OppositionMode()
         self.support_mode = SupportMode()
         self.independent_mode = IndependentMode()
-        self.consensus_client = OpenRouterClient()  # Use OpenRouter for consensus
+        self.consensus_client = LLMAgentClient()  # Use OpenRouter for consensus
     
     def execute_query(self, user_query: str, mode_override: str = None) -> dict:
         """Main orchestration logic"""

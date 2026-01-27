@@ -1,9 +1,9 @@
 # backend/app/agents/opposition_mode.py
-from app.utils.openrouter_client import OpenRouterClient
+from app.utils.LLM_agent_client import LLMAgentClient
 
 class OppositionMode:
     def __init__(self):
-        self.client = OpenRouterClient()
+        self.client = LLMAgentClient()
     
     def generator_agent(self, user_query: str) -> str:
         """Generate initial response using Agent 1"""

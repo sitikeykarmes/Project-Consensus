@@ -1,9 +1,9 @@
 # backend/app/agents/support_mode.py
-from app.utils.openrouter_client import OpenRouterClient
+from app.utils.LLM_agent_client import LLMAgentClient
 
 class SupportMode:
     def __init__(self):
-        self.client = OpenRouterClient()
+        self.client = LLMAgentClient()
     
     def lead_agent(self, user_query: str) -> str:
         """Create initial draft using Agent 1"""
