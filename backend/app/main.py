@@ -76,16 +76,16 @@ orchestrator = MockOrchestrator()
 def read_root():
     return {"message": "Project Consensus API is running", "status": "active"}
 
-@app.post("/api/query", response_model=ConsensusOutput)
-async def process_query(request: QueryRequest):
+@app.post("/api/query")
+async def process_query(message: str):
     """Process user query through orchestration"""
-    result = orchestrator.execute_query(request.message)
+    result = orchestrator.execute_query(message)
     
-    return ConsensusOutput(
-        final_answer=result["final_answer"],
-        mode_used=result["mode_used"],
-        agent_responses=result["agent_responses"]
-    )
+    return {
+        "final_answer": result["final_answer"],
+        "mode_used": result["mode_used"],
+        "agent_responses": result["agent_responses"]
+    }
 
 @app.websocket("/ws/{room_id}/{user_name}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str):
