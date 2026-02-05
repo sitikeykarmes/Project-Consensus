@@ -198,87 +198,141 @@ async def process_query(request: QueryRequest):
 
 @app.websocket("/ws/{room_id}/{user_name}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str):
+    """
+    WhatsApp-like real-time group chat WebSocket
+    Supports:
+    - User messages
+    - Multi-agent responses
+    - Consensus + Mode display
+    """
+
     await manager.connect(websocket, room_id, user_name)
-    
-    # Update group's online users
-    online_users = manager.get_room_users(room_id)
-    
-    # Notify room of new user
+
+    # Notify room user joined
     await manager.broadcast_to_room({
         "type": "user_joined",
         "user_name": user_name,
-        "online_users": online_users,
+        "online_users": manager.get_room_users(room_id),
         "timestamp": datetime.now().isoformat()
     }, room_id)
-    
+
     try:
         while True:
-            # Receive message from client
+            # Receive message from frontend
             data = await websocket.receive_text()
             message_data = json.loads(data)
-            
-            # Update last message in group
+
+            user_message = message_data.get("message", "").strip()
+
+            if not user_message:
+                continue
+
+            # Update group last message
             if room_id in groups_db:
-                groups_db[room_id]["last_message"] = message_data["message"][:50]
+                groups_db[room_id]["last_message"] = user_message[:50]
                 groups_db[room_id]["last_message_time"] = datetime.now().isoformat()
-            
-            # Broadcast user message to room
+
+            # Broadcast user message instantly
             await manager.broadcast_to_room({
                 "type": "user_message",
                 "user_name": user_name,
-                "content": message_data["message"],
+                "content": user_message,
                 "timestamp": datetime.now().isoformat()
             }, room_id)
-            
-            # Check if any agents are in this group
+
+            # -------------------------------------------------------
+            # ✅ MULTI-AGENT RESPONSE LOGIC
+            # -------------------------------------------------------
+
             if orchestrator and room_id in groups_db:
+
                 group = groups_db[room_id]
-                if group["agents"]:
-                    # Process through orchestrator
-                    try:
-                        result = orchestrator.execute_query(message_data["message"])
-                        
-                        # Stream agent responses for agents in this group
-                        for agent_response in result["agent_responses"]:
-                            # Map agent names to IDs
-                            agent_id_map = {
-                                "Research Agent": "agent_research",
-                                "Analysis Agent": "agent_analysis",
-                                "Synthesis Agent": "agent_synthesis"
-                            }
-                            
-                            agent_id = agent_id_map.get(agent_response["agent_name"])
-                            
-                            if agent_id and agent_id in group["agents"]:
-                                await manager.broadcast_to_room({
-                                    "type": "agent_response",
-                                    "agent_id": agent_id,
-                                    "agent_name": agent_response["agent_name"],
-                                    "content": agent_response["content"],
-                                    "mode": agent_response["mode"],
-                                    "timestamp": datetime.now().isoformat()
-                                }, room_id)
-                        
-                        # Send final consensus if agents are present
-                        if result["agent_responses"]:
+
+                # If no agents in this group → skip AI
+                if not group["agents"]:
+                    continue
+
+                print(f"\n🤖 Agents active in {room_id}: {group['agents']}")
+
+                try:
+                    # Run orchestrator pipeline
+                    result = orchestrator.execute_query(user_message)
+
+                    mode_used = result["mode_used"]
+                    agent_responses = result["agent_responses"]
+                    final_answer = result["final_answer"]
+
+                    # ✅ Broadcast mode info first
+                    await manager.broadcast_to_room({
+                        "type": "system",
+                        "content": f"⚙️ Mode Selected: {mode_used.upper()}",
+                        "timestamp": datetime.now().isoformat()
+                    }, room_id)
+
+                    # -------------------------------------------------------
+                    # ✅ STREAM EACH AGENT RESPONSE
+                    # -------------------------------------------------------
+
+                    # Correct mapping based on your backend agent naming
+                    agent_id_map = {
+                        "Agent 1 (Agent 1)": "agent_research",
+                        "Lead Agent (Agent 1)": "agent_research",
+                        "Generator (Agent 1)": "agent_research",
+
+                        "Agent 2 (Agent 2)": "agent_analysis",
+                        "Supplementer (Agent 2)": "agent_analysis",
+                        "Critic (Agent 2)": "agent_analysis",
+
+                        "Agent 3 (Agent 3)": "agent_synthesis",
+                    }
+
+                    for response in agent_responses:
+                        agent_name = response["agent_name"]
+                        content = response["content"]
+
+                        agent_id = agent_id_map.get(agent_name)
+
+                        # Only send if agent is actually inside this group
+                        if agent_id and agent_id in group["agents"]:
+
                             await manager.broadcast_to_room({
-                                "type": "consensus",
-                                "content": result["final_answer"],
-                                "mode_used": result["mode_used"],
+                                "type": "agent_response",
+                                "agent_id": agent_id,
+                                "agent_name": agent_name,
+                                "content": f"[Mode: {mode_used}] \n\n{content}",
                                 "timestamp": datetime.now().isoformat()
                             }, room_id)
-                    except Exception as e:
-                        print(f"Error processing agent query: {e}")
-            
+
+                    # -------------------------------------------------------
+                    # ✅ FINAL CONSENSUS MESSAGE
+                    # -------------------------------------------------------
+
+                    await manager.broadcast_to_room({
+                        "type": "consensus",
+                        "content": f"✅ FINAL CONSENSUS ({mode_used.upper()} MODE):\n\n{final_answer}",
+                        "mode_used": mode_used,
+                        "timestamp": datetime.now().isoformat()
+                    }, room_id)
+
+                except Exception as e:
+                    print("❌ Error running orchestrator:", e)
+
+                    await manager.broadcast_to_room({
+                        "type": "error",
+                        "content": "⚠️ AI Agents failed to respond.",
+                        "timestamp": datetime.now().isoformat()
+                    }, room_id)
+
     except WebSocketDisconnect:
         manager.disconnect(websocket, room_id)
-        online_users = manager.get_room_users(room_id)
+
         await manager.broadcast_to_room({
             "type": "user_left",
             "user_name": user_name,
-            "online_users": online_users,
+            "online_users": manager.get_room_users(room_id),
             "timestamp": datetime.now().isoformat()
         }, room_id)
+
 
 if __name__ == "__main__":
     import uvicorn

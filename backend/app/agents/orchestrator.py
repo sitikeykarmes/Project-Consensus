@@ -51,18 +51,24 @@ class Orchestrator:
             for r in agent_results["responses"]
         ])
         
-        synthesis_prompt = f"""Original Query: {original_query}
+        synthesis_prompt = f"""User Query: {original_query}
 
 Agent Responses:
 {responses_text}
 
-You are a consensus synthesizer. Your job is to:
-1. Analyze all agent responses
-2. Identify key points of agreement
-3. Address any contradictions
-4. Produce a final, verified answer that incorporates the best insights
+You are the final assistant in a WhatsApp group chat.
 
-Be concise but comprehensive. Synthesize a final consensus answer:"""
+Task:
+- Summarize the key takeaway from the agent discussion.
+- Mention if any correction/debate happened.
+- Give ONE short final answer until asked for longer answer.
+
+Rules:
+- Max 4 lines until asked beyond this limit.
+- Give Headings and formatting.
+- Sound like ChatGPT/Gemini.
+
+Be concise. Synthesize a final consensus answer:"""
 
         try:
             messages = [

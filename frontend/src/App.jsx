@@ -1,69 +1,37 @@
-import { useState, useEffect } from 'react';
-import WhatsAppLayout from './components/WhatsAppLayout';
-import axios from 'axios';
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+import { useEffect, useState } from "react";
+import Sidebar from "./components/Sidebar";
+import ChatWindow from "./components/ChatWindow";
+import { fetchGroups } from "./api/ChatApi";
 
 export default function App() {
   const [groups, setGroups] = useState([]);
-  const [currentUser] = useState('User');
-  const [availableAgents, setAvailableAgents] = useState([]);
+  const [activeGroup, setActiveGroup] = useState(null);
+
+  // Load groups from backend
+  async function loadGroups() {
+    const data = await fetchGroups();
+    setGroups(data.groups);
+    if (!activeGroup && data.groups.length > 0) {
+      setActiveGroup(data.groups[0]);
+    }
+  }
 
   useEffect(() => {
     loadGroups();
-    loadAgents();
   }, []);
 
-  const loadGroups = async () => {
-    try {
-      const response = await axios.get(`${BACKEND_URL}/api/groups`);
-      setGroups(response.data.groups);
-    } catch (error) {
-      console.error('Error loading groups:', error);
-    }
-  };
-
-  const loadAgents = async () => {
-    try {
-      const response = await axios.get(`${BACKEND_URL}/api/agents`);
-      setAvailableAgents(response.data.agents);
-    } catch (error) {
-      console.error('Error loading agents:', error);
-    }
-  };
-
-  const handleCreateGroup = async (groupData) => {
-    try {
-      const response = await axios.post(`${BACKEND_URL}/api/groups`, groupData);
-      if (response.data.success) {
-        loadGroups();
-        return response.data.group;
-      }
-    } catch (error) {
-      console.error('Error creating group:', error);
-    }
-  };
-
-  const handleAddMember = async (groupId, memberId, memberType) => {
-    try {
-      await axios.post(`${BACKEND_URL}/api/groups/${groupId}/members`, {
-        member_id: memberId,
-        member_type: memberType
-      });
-      loadGroups();
-    } catch (error) {
-      console.error('Error adding member:', error);
-    }
-  };
-
   return (
-    <WhatsAppLayout 
-      groups={groups}
-      currentUser={currentUser}
-      availableAgents={availableAgents}
-      onCreateGroup={handleCreateGroup}
-      onAddMember={handleAddMember}
-      onRefreshGroups={loadGroups}
-    />
+    <div className="h-screen w-screen flex bg-[#f0f2f5]">
+      {/* Sidebar */}
+      <Sidebar
+        groups={groups}
+        activeGroup={activeGroup}
+        setActiveGroup={setActiveGroup}
+        reloadGroups={loadGroups}
+      />
+
+      {/* Chat Window */}
+      {activeGroup && <ChatWindow group={activeGroup} />}
+    </div>
   );
 }
