@@ -28,9 +28,9 @@ groups_db: Dict[str, dict] = {}
 
 # Available AI agents
 AVAILABLE_AGENTS = [
-    {"id": "agent_research", "name": "Research Agent", "type": "agent", "avatar": "🔍"},
-    {"id": "agent_analysis", "name": "Analysis Agent", "type": "agent", "avatar": "📊"},
-    {"id": "agent_synthesis", "name": "Synthesis Agent", "type": "agent", "avatar": "🧠"},
+    {"id": "agent_research", "name": "Agent 1", "type": "agent", "avatar": "🔍"},
+    {"id": "agent_analysis", "name": "Agent 2", "type": "agent", "avatar": "📊"},
+    {"id": "agent_synthesis", "name": "Agent 3", "type": "agent", "avatar": "🧠"},
 ]
 
 # Connection manager for WebSocket
