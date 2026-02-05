@@ -10,7 +10,7 @@ Rules:
 - Replies must be SHORT (max 2-3 lines until asked for longer answer).
 - No essays, no markdown tables.
 - Write essays, give long tables, bullet lists, etc. only when the user explicitly asks for it.
-- Only one key point per message.
+- Only key point per message.
 - Speak naturally like ChatGPT/Gemini in a group.
 """
 
@@ -53,7 +53,7 @@ User Query: {user_query}
 Agent 1 said:
 {generator_text}
 
-Reply with ONE short correction or disagreement.
+Reply with short correction or disagreement.
 """,
             },
         ]
@@ -115,7 +115,7 @@ User Query: {user_query}
 Referee feedback:
 {referee_note}
 
-Now rewrite your answer in 2–3 lines.
+Now rewrite your answer in 2-3 lines.
 """,
             },
         ]

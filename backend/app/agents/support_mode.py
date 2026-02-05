@@ -39,7 +39,7 @@ User query: {user_query}
 Agent 1 said:
 {lead_response}
 
-Add one extra helpful point (do not repeat).
+Add extra helpful point/points (do not repeat).
 """,
             },
         ]
@@ -48,7 +48,7 @@ Add one extra helpful point (do not repeat).
 
     def third_agent(self, user_query: str, previous: str) -> str:
         messages = [
-            {"role": "system", "content": CHAT_RULES + "\nRole: Support Agent 3. Add one final small nuance."},
+            {"role": "system", "content": CHAT_RULES + "\nRole: Support Agent 3. Add final small nuance."},
             {
                 "role": "user",
                 "content": f"""
@@ -57,7 +57,7 @@ User query: {user_query}
 Previous agents said:
 {previous}
 
-Add one more helpful point, very short.
+Add more helpful point, very short.
 """,
             },
         ]
