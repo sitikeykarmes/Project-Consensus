@@ -7,12 +7,11 @@ CHAT_RULES = """
 You are inside a WhatsApp group chat with other AI agents.
 
 Rules:
-- Replies must be short (max 2-3 lines until asked for longer answer).
-- Do NOT write long essays, tables, or bullet lists until asked.
+- Replies must be short (max 2-3 lines until asked for long answer).
+- Do NOT write long essays or tables until asked.
 - Write essays, give long tables, bullet lists, etc. only when the user explicitly asks for it.
-- Do NOT rewrite the full answer.
-- Add 2-3 extra useful points.
-- Avoid repetition.
+- Do NOT repeat what others said.
+- Add only 1-3 useful new points.
 """
 
 
@@ -22,46 +21,43 @@ class SupportMode:
 
     def lead_agent(self, user_query: str) -> str:
         messages = [
-            {"role": "system", "content": CHAT_RULES + "\nRole: Lead Agent. Start the answer briefly."},
+            {"role": "system",
+             "content": CHAT_RULES + "\nRole: Agent 1. Give the main answer briefly."},
             {"role": "user", "content": user_query},
         ]
-
-        return self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=200)
+        return self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=120)
 
     def supplementer_agent(self, user_query: str, lead_response: str) -> str:
         messages = [
-            {"role": "system", "content": CHAT_RULES + "\nRole: Support Agent. Add 1-3 extra points."},
-            {
-                "role": "user",
-                "content": f"""
+            {"role": "system",
+             "content": CHAT_RULES + "\nRole: Agent 2. Add extra helpful nuance."},
+            {"role": "user",
+             "content": f"""
 User query: {user_query}
 
 Agent 1 said:
 {lead_response}
 
-Add extra helpful point/points (do not repeat).
-""",
-            },
+Add 1-2 extra points (no repetition).
+"""}
         ]
-
-        return self.client.get_completion("agent2", messages, temperature=0.7, max_tokens=80)
+        return self.client.get_completion("agent2", messages, temperature=0.7, max_tokens=100)
 
     def third_agent(self, user_query: str, previous: str) -> str:
         messages = [
-            {"role": "system", "content": CHAT_RULES + "\nRole: Support Agent 3. Add final small nuance."},
-            {
-                "role": "user",
-                "content": f"""
+            {"role": "system",
+             "content": CHAT_RULES +
+                        "\nRole: Agent 3. Give a final practical takeaway or caution."},
+            {"role": "user",
+             "content": f"""
 User query: {user_query}
 
-Previous agents said:
+So far agents said:
 {previous}
 
-Add more helpful point, very short.
-""",
-            },
+Add final useful takeaway (short).
+"""}
         ]
-
         return self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=80)
 
     def run(self, user_query: str) -> dict:
@@ -74,8 +70,8 @@ Add more helpful point, very short.
         return {
             "mode": "support",
             "responses": [
-                {"agent_name": "Lead Agent (Agent 1)", "content": lead, "mode": "support"},
-                {"agent_name": "Supplementer (Agent 2)", "content": supplement, "mode": "support"},
-                {"agent_name": "Supporter (Agent 3)", "content": third, "mode": "support"},
+                {"agent_name": "Agent 1 (Agent 1)", "content": lead, "mode": "support"},
+                {"agent_name": "Agent 2 (Agent 2)", "content": supplement, "mode": "support"},
+                {"agent_name": "Agent 3 (Agent 3)", "content": third, "mode": "support"},
             ],
         }

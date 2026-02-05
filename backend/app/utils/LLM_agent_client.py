@@ -46,7 +46,7 @@ class LLMAgentClient:
         model_key: str,
         messages: List[Dict],
         temperature: float = 0.7,
-        max_tokens: int = 200,
+        max_tokens: int = 400,
     ) -> str:
         """
         Calls Groq chat completion safely.
@@ -83,9 +83,9 @@ class LLMAgentClient:
             print(f"🔄 Requesting {model_key} ({model_name}) via Groq...")
 
             # -----------------------------------------
-            # Retry Attempts (3 total)
+            # Retry Attempts (4 total)
             # -----------------------------------------
-            token_boosts = [0, 50, 100]
+            token_boosts = [0, 50, 100,150]
 
             for attempt, boost in enumerate(token_boosts, start=1):
 
@@ -105,8 +105,8 @@ class LLMAgentClient:
             # -----------------------------------------
             # Final fallback if all attempts fail
             # -----------------------------------------
-            print(f"❌ {model_key} failed after 3 attempts (blank output).")
-            return "⚠️ Agent did not respond properly after 3 attempts. Please try again."
+            print(f"❌ {model_key} failed after 4 attempts (blank output).")
+            return "⚠️ Agent did not respond properly after 4 attempts. Please try again."
 
         except Exception as e:
             error_msg = f"Error with {model_key} ({model_name}): {str(e)}"
