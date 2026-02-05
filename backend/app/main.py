@@ -70,10 +70,23 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 # Initialize orchestrator (optional, for AI agents)
+orchestrator = None
 try:
-    orchestrator = Orchestrator()
+    # Explicitly verify API keys are loaded
+    groq_key = os.getenv("GROQ_API_KEY")
+    groq_key_1 = os.getenv("GROQ_API_KEY_1")
+    
+    if groq_key and groq_key_1:
+        print(f"✅ API keys loaded successfully")
+        orchestrator = Orchestrator()
+        print(f"✅ Orchestrator initialized successfully")
+    else:
+        print(f"⚠️ Warning: API keys not found in environment")
+        print(f"   GROQ_API_KEY: {'Found' if groq_key else 'NOT FOUND'}")
+        print(f"   GROQ_API_KEY_1: {'Found' if groq_key_1 else 'NOT FOUND'}")
 except Exception as e:
-    print(f"Warning: Could not initialize orchestrator: {e}")
+    print(f"⚠️ Warning: Could not initialize orchestrator: {e}")
+    print(f"   The chat interface will work, but AI agents won't respond")
     orchestrator = None
 
 # Initialize default groups
