@@ -3,6 +3,15 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.db.init_db import init_database
+from app.db.database import SessionLocal
+
+from app.db.message_service import save_message, load_recent_messages
+
+from app.auth.auth_routes import router as auth_router
+from app.groups.group_routes import router as group_router
+from app.chat.chat_routes import router as chat_router
+
 from app.models.schemas import (
     QueryRequest,
     ConsensusOutput,
@@ -31,6 +40,15 @@ load_dotenv(dotenv_path=env_path)
 
 app = FastAPI(title="WhatsApp-like Chat API")
 
+# Initialize DB Tables
+init_database()
+
+# Auth Router
+app.include_router(auth_router)
+app.include_router(group_router)
+app.include_router(chat_router)
+
+
 
 # ------------------------------------------------------------
 # ✅ Enable CORS
@@ -46,7 +64,7 @@ app.add_middleware(
 
 
 # ------------------------------------------------------------
-# ✅ In-Memory Group Storage
+# ✅ In-Memory Group Storage (Temporary)
 # ------------------------------------------------------------
 
 groups_db: Dict[str, dict] = {}
@@ -130,7 +148,7 @@ except Exception as e:
 
 
 # ------------------------------------------------------------
-# ✅ Default Group Setup (ALL AGENTS ENABLED)
+# ✅ Default Group Setup
 # ------------------------------------------------------------
 
 def initialize_default_groups():
@@ -216,22 +234,6 @@ def add_member(group_id: str, request: AddMemberRequest):
     return {"success": True, "group": group}
 
 
-@app.delete("/api/groups/{group_id}/members/{member_id}")
-def remove_member(group_id: str, member_id: str):
-    if group_id not in groups_db:
-        raise HTTPException(status_code=404, detail="Group not found")
-
-    group = groups_db[group_id]
-
-    if member_id in group["members"]:
-        group["members"].remove(member_id)
-
-    if member_id in group["agents"]:
-        group["agents"].remove(member_id)
-
-    return {"success": True, "group": group}
-
-
 @app.get("/api/agents")
 def get_available_agents():
     return {"agents": AVAILABLE_AGENTS}
@@ -261,7 +263,7 @@ async def process_query(request: QueryRequest):
 
 
 # ------------------------------------------------------------
-# ✅ Robust Agent Resolver (Fixes Missing Agent 3)
+# ✅ Agent Resolver
 # ------------------------------------------------------------
 
 def resolve_agent_id(agent_name: str) -> str | None:
@@ -271,24 +273,46 @@ def resolve_agent_id(agent_name: str) -> str | None:
     if "agent 1" in name or "lead" in name or "generator" in name:
         return "agent_research"
 
-    if "agent 2" in name or "critic" in name or "supplement" in name:
+    if "agent 2" in name or "critic" in name:
         return "agent_analysis"
 
-    if "agent 3" in name or "supporter" in name or "synthesis" in name:
+    if "agent 3" in name or "referee" in name or "synthesis" in name:
         return "agent_synthesis"
 
     return None
 
 
 # ------------------------------------------------------------
-# ✅ WebSocket Chat Endpoint
+# ✅ WebSocket Chat Endpoint (WhatsApp Behavior)
 # ------------------------------------------------------------
 
 @app.websocket("/ws/{room_id}/{user_name}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str):
 
+    # Connect User
     await manager.connect(websocket, room_id, user_name)
 
+    # ------------------------------------------------------------
+    # ✅ Load Previous Messages When User Joins
+    # ------------------------------------------------------------
+
+    db = SessionLocal()
+    try:
+        recent_messages = load_recent_messages(db, room_id)
+
+        for msg in recent_messages:
+            await websocket.send_json(
+                {
+                    "type": msg.sender_type,         # ✅ user / agent / system
+                    "sender_name": msg.sender_name,  # ✅ always present
+                    "content": msg.content,
+                    "timestamp": msg.timestamp.isoformat(),
+                }
+            )
+    finally:
+        db.close()
+
+    # Broadcast Join
     await manager.broadcast_to_room(
         {
             "type": "user_joined",
@@ -302,7 +326,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str)
     try:
         while True:
 
-            # Receive user message
+            # Receive Message
             data = await websocket.receive_text()
             message_data = json.loads(data)
 
@@ -310,18 +334,35 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str)
             if not user_message:
                 continue
 
-            # Broadcast user message instantly
+            # ------------------------------------------------------------
+            # ✅ Save User Message
+            # ------------------------------------------------------------
+
+            db = SessionLocal()
+            try:
+                save_message(
+                    db=db,
+                    group_id=room_id,
+                    sender_id=user_name,
+                    sender_name=user_name,   # ✅ FIX
+                    sender_type="user",
+                    content=user_message,
+                )
+            finally:
+                db.close()
+
+            # Broadcast User Message
             await manager.broadcast_to_room(
                 {
-                    "type": "user_message",
-                    "user_name": user_name,
+                    "type": "user",
+                    "sender_name": user_name,
                     "content": user_message,
                     "timestamp": datetime.now().isoformat(),
                 },
                 room_id,
             )
 
-            # Skip AI if orchestrator disabled
+            # Skip AI if Disabled
             if not orchestrator or room_id not in groups_db:
                 continue
 
@@ -349,10 +390,13 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str)
                 room_id,
             )
 
-            # Sort responses for consistent order
+            # Sort Agent Responses
             agent_responses.sort(key=lambda r: r["agent_name"])
 
-            # Stream each agent response
+            # ------------------------------------------------------------
+            # ✅ Stream + Save Each Agent Response
+            # ------------------------------------------------------------
+
             for response in agent_responses:
 
                 agent_name = response.get("agent_name", "Unknown")
@@ -369,11 +413,25 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str)
                 if agent_id not in group["agents"]:
                     continue
 
+                # Save Agent Message
+                db = SessionLocal()
+                try:
+                    save_message(
+                        db=db,
+                        group_id=room_id,
+                        sender_id=agent_id,
+                        sender_name=agent_name,   # ✅ FIX
+                        sender_type="agent",
+                        content=content,
+                    )
+                finally:
+                    db.close()
+
+                # Broadcast Agent Message
                 await manager.broadcast_to_room(
                     {
-                        "type": "agent_response",
-                        "agent_id": agent_id,
-                        "agent_name": agent_name,
+                        "type": "agent",
+                        "sender_name": agent_name,
                         "content": content,
                         "mode_used": mode_used,
                         "timestamp": datetime.now().isoformat(),
@@ -381,10 +439,27 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str)
                     room_id,
                 )
 
-            # Final Consensus
+            # ------------------------------------------------------------
+            # ✅ Save + Broadcast Final Consensus
+            # ------------------------------------------------------------
+
+            db = SessionLocal()
+            try:
+                save_message(
+                    db=db,
+                    group_id=room_id,
+                    sender_id="consensus",
+                    sender_name="Consensus",   # ✅ FIX
+                    sender_type="system",
+                    content=final_answer.strip(),
+                )
+            finally:
+                db.close()
+
             await manager.broadcast_to_room(
                 {
-                    "type": "consensus",
+                    "type": "system",
+                    "sender_name": "Consensus",
                     "content": final_answer.strip(),
                     "mode_used": mode_used,
                     "timestamp": datetime.now().isoformat(),

@@ -11,17 +11,20 @@ export default function ChatWindow({ group }) {
   useEffect(() => {
     setMessages([]);
 
+    // ✅ Use your username here (later replace with login user)
+    const username = "Kartikey";
+
     socketRef.current = new WebSocket(
-      `ws://localhost:8001/ws/${group.id}/Kartikey`,
+      `ws://localhost:8001/ws/${group.id}/${username}`,
     );
 
     socketRef.current.onmessage = (event) => {
       const msg = JSON.parse(event.data);
 
+      // ✅ Accept only valid message types
       if (
-        msg.type === "user_message" ||
-        msg.type === "agent_response" ||
-        msg.type === "consensus" ||
+        msg.type === "user" ||
+        msg.type === "agent" ||
         msg.type === "system"
       ) {
         setMessages((prev) => [...prev, msg]);

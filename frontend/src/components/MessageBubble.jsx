@@ -1,7 +1,6 @@
 export default function MessageBubble({ msg }) {
-  const isUser = msg.type === "user_message";
-  const isAgent = msg.type === "agent_response";
-  const isConsensus = msg.type === "consensus";
+  const isUser = msg.type === "user";
+  const isAgent = msg.type === "agent";
   const isSystem = msg.type === "system";
 
   return (
@@ -13,12 +12,15 @@ export default function MessageBubble({ msg }) {
             ? "bg-[#d9fdd3]"
             : isAgent
               ? "bg-white border-l-4 border-blue-500"
-              : isConsensus
-                ? "bg-yellow-100 border-l-4 border-green-600"
-                : "bg-gray-200 italic"
+              : "bg-yellow-100 border-l-4 border-green-600 italic"
         }`}
       >
-        {isAgent && <p className="font-bold text-xs mb-1">{msg.agent_name}</p>}
+        {/* ✅ Show sender name for agent/system */}
+        {!isUser && (
+          <p className="font-bold text-xs mb-1 text-gray-600">
+            {msg.sender_name}
+          </p>
+        )}
 
         <p>{msg.content}</p>
       </div>

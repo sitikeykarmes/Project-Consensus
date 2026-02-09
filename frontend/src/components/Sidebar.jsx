@@ -40,7 +40,7 @@ export default function Sidebar({
             <div className="flex-1 border-b pb-2">
               <p className="font-semibold">{group.name}</p>
               <p className="text-sm text-gray-500 truncate">
-                {group.last_message}
+                {group.last_message || "No messages yet..."}
               </p>
             </div>
           </div>
