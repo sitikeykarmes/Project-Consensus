@@ -6,6 +6,7 @@ import ChatInput from "./ChatInput";
 export default function ChatWindow({ group }) {
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const socketRef = useRef(null);
 
@@ -21,6 +22,13 @@ export default function ChatWindow({ group }) {
     if (!token) {
       alert("❌ You are not logged in!");
       return;
+    }
+
+    // ✅ Get current user ID from localStorage
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const userData = JSON.parse(userStr);
+      setCurrentUserId(userData.id);
     }
 
     // ✅ WebSocket URL with token
@@ -83,7 +91,7 @@ export default function ChatWindow({ group }) {
       {/* Messages */}
       <div className="flex-1 bg-[#efeae2] px-6 py-4 overflow-y-auto space-y-3">
         {messages.map((msg, i) => (
-          <MessageBubble key={i} msg={msg} />
+          <MessageBubble key={i} msg={msg} currentUserId={currentUserId} />
         ))}
       </div>
 

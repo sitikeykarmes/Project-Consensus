@@ -273,6 +273,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             await websocket.send_json(
                 {
                     "type": msg.sender_type,
+                    "sender_id": msg.sender_id,
                     "sender_name": msg.sender_name,
                     "content": msg.content,
                     "timestamp": msg.timestamp.isoformat(),
@@ -323,6 +324,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             await manager.broadcast_to_room(
                 {
                     "type": "user",
+                    "sender_id": user.id,
                     "sender_name": user_email,
                     "content": user_message,
                     "timestamp": datetime.now().isoformat(),

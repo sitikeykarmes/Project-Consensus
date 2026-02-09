@@ -1,11 +1,14 @@
-export default function MessageBubble({ msg }) {
-  const isUser = msg.type === "user";
+export default function MessageBubble({ msg, currentUserId }) {
+  // ✅ Check if this message is from the current logged-in user
+  const isCurrentUser = msg.type === "user" && msg.sender_id === currentUserId;
   const isAgent = msg.type === "agent";
   const isSystem = msg.type === "system";
 
   // ✅ Label formatting
   function getSenderLabel() {
-    if (isUser) return "You";
+    if (isCurrentUser) return "You";
+
+    if (msg.type === "user") return msg.sender_name || "User";
 
     if (isAgent) return msg.sender_name || "Agent";
 
@@ -18,11 +21,11 @@ export default function MessageBubble({ msg }) {
   }
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+    <div className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}>
       <div
         className={`max-w-[65%] px-4 py-2 rounded-xl text-sm shadow-sm whitespace-pre-line
         ${
-          isUser
+          isCurrentUser
             ? "bg-[#d9fdd3]"
             : isAgent
               ? "bg-white border-l-4 border-blue-500"
