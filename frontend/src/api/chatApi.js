@@ -1,7 +1,20 @@
 const BASE_URL = "http://localhost:8001";
 
-export async function fetchGroups() {
-  const res = await fetch(`${BASE_URL}/api/groups`);
+export async function fetchGroups(token) {
+  const res = await fetch("http://localhost:8001/groups/my", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  // ✅ Handle Unauthorized
+  if (!res.ok) {
+    const err = await res.json();
+    console.error("Fetch Groups Error:", err);
+    return { groups: [] };
+  }
+
   return res.json();
 }
 

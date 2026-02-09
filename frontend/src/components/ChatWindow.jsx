@@ -5,45 +5,80 @@ import ChatInput from "./ChatInput";
 
 export default function ChatWindow({ group }) {
   const [messages, setMessages] = useState([]);
+  const [connected, setConnected] = useState(false);
+
   const socketRef = useRef(null);
 
-  // Connect WebSocket when group changes
   useEffect(() => {
+    if (!group) return;
+
     setMessages([]);
+    setConnected(false);
 
-    // ✅ Use your username here (later replace with login user)
-    const username = "Kartikey";
+    // ✅ Get token from localStorage
+    const token = localStorage.getItem("token");
 
-    socketRef.current = new WebSocket(
-      `ws://localhost:8001/ws/${group.id}/${username}`,
+    if (!token) {
+      alert("❌ You are not logged in!");
+      return;
+    }
+
+    // ✅ WebSocket URL with token
+    const socket = new WebSocket(
+      `ws://localhost:8001/ws/${group.id}?token=${token}`,
     );
 
-    socketRef.current.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
+    socketRef.current = socket;
 
-      // ✅ Accept only valid message types
-      if (
-        msg.type === "user" ||
-        msg.type === "agent" ||
-        msg.type === "system"
-      ) {
-        setMessages((prev) => [...prev, msg]);
-      }
+    socket.onopen = () => {
+      console.log("✅ WebSocket Connected");
+      setConnected(true);
+    };
+
+    socket.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      setMessages((prev) => [...prev, msg]);
+    };
+
+    socket.onclose = () => {
+      console.log("❌ WebSocket Closed");
+      setConnected(false);
+    };
+
+    socket.onerror = (err) => {
+      console.log("⚠️ WebSocket Error:", err);
+      setConnected(false);
     };
 
     return () => {
-      socketRef.current.close();
+      socket.close();
     };
   }, [group.id]);
 
-  // Send message
+  // ✅ Safe send
   function sendMessage(text) {
+    if (!socketRef.current) return;
+
+    if (socketRef.current.readyState !== WebSocket.OPEN) {
+      alert("❌ Socket not connected yet!");
+      return;
+    }
+
     socketRef.current.send(JSON.stringify({ message: text }));
   }
 
   return (
     <div className="flex-1 flex flex-col">
       <ChatHeader group={group} />
+
+      {/* Connection status */}
+      <div className="text-xs text-center py-1">
+        {connected ? (
+          <span className="text-green-600">🟢 Connected</span>
+        ) : (
+          <span className="text-red-500">🔴 Connecting...</span>
+        )}
+      </div>
 
       {/* Messages */}
       <div className="flex-1 bg-[#efeae2] px-6 py-4 overflow-y-auto space-y-3">
@@ -52,7 +87,8 @@ export default function ChatWindow({ group }) {
         ))}
       </div>
 
-      <ChatInput sendMessage={sendMessage} />
+      {/* Input */}
+      <ChatInput sendMessage={sendMessage} disabled={!connected} />
     </div>
   );
 }

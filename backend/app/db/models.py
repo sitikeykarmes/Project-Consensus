@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer,String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
@@ -37,12 +37,14 @@ class User(Base):
 class Group(Base):
     __tablename__ = "groups"
 
-    id = Column(String, primary_key=True, default=generate_id)
+    id = Column(String, primary_key=True)
+    name = Column(String)
 
-    name = Column(String, unique=True)
-    created_by = Column(String, ForeignKey("users.id"))
+    # ✅ NEW: Store selected agents as JSON string
+    agents = Column(Text, default="[]")
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(Integer)
+    created_at = Column(DateTime)
 
     # Relationships
     members = relationship(

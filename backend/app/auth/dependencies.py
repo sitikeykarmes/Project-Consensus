@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.models import User
 
-SECRET_KEY = os.getenv("JWT_SECRET", "super-secret-key-change-this")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecretkey")
 ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")

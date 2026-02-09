@@ -3,6 +3,20 @@ export default function MessageBubble({ msg }) {
   const isAgent = msg.type === "agent";
   const isSystem = msg.type === "system";
 
+  // ✅ Label formatting
+  function getSenderLabel() {
+    if (isUser) return "You";
+
+    if (isAgent) return msg.sender_name || "Agent";
+
+    if (isSystem) {
+      if (msg.sender_name === "Consensus") return "🤝 Consensus";
+      return msg.sender_name || "System";
+    }
+
+    return "";
+  }
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
@@ -15,13 +29,12 @@ export default function MessageBubble({ msg }) {
               : "bg-yellow-100 border-l-4 border-green-600 italic"
         }`}
       >
-        {/* ✅ Show sender name for agent/system */}
-        {!isUser && (
-          <p className="font-bold text-xs mb-1 text-gray-600">
-            {msg.sender_name}
-          </p>
-        )}
+        {/* ✅ Always show sender name */}
+        <p className="font-bold text-xs mb-1 text-gray-600">
+          {getSenderLabel()}
+        </p>
 
+        {/* Message Content */}
         <p>{msg.content}</p>
       </div>
     </div>
