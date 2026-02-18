@@ -23,7 +23,7 @@ export default function Login({ setUser }) {
     formData.append("password", password);
 
     try {
-      const res = await fetch(`${BASE_URL}/auth/login`, {
+      const res = await fetch(`${BASE_URL}/api/auth/login`, {
         method: "POST",
         body: formData,
       });
