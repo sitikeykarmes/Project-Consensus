@@ -5,7 +5,7 @@ from app.db.database import get_db
 from app.db.models import Message, GroupMember
 from app.auth.dependencies import get_current_user
 
-router = APIRouter(prefix="/chat", tags=["Chat"])
+router = APIRouter(prefix="/api/chat", tags=["Chat"])
 
 
 # ✅ Send Message
