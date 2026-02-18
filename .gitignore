@@ -3,3 +3,7 @@ backend/app/__init__.py
 backend/venv/
 backend/.env
 backend/.venv/
+-e 
+# Environment files
+*.env
+*.env.*
