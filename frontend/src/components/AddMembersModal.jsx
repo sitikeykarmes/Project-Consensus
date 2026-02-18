@@ -47,7 +47,7 @@ export default function AddMembersModal({ groupId, close, onMembersAdded }) {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${BASE_URL}/groups/${groupId}/add-members`, {
+      const res = await fetch(`${BASE_URL}/api/groups/${groupId}/add-members`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
