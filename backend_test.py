@@ -84,10 +84,10 @@ class ChatPlatformTester:
             'password': password
         }
         
-        # Remove Content-Type header for form data
-        headers_without_json = {}
+        # Use form-encoded content type
+        headers_form = {'Content-Type': 'application/x-www-form-urlencoded'}
         if self.token:
-            headers_without_json['Authorization'] = f'Bearer {self.token}'
+            headers_form['Authorization'] = f'Bearer {self.token}'
             
         success, response = self.run_test(
             "Login User",
@@ -95,7 +95,7 @@ class ChatPlatformTester:
             "api/auth/login",
             200,
             data=form_data,
-            headers=headers_without_json
+            headers=headers_form
         )
         
         if success and 'access_token' in response:
