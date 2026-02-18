@@ -34,7 +34,7 @@ from pathlib import Path
 env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-app = FastAPI(title="WhatsApp-like Chat API")
+app = FastAPI(title="Consensus")
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecretkey")
 ALGORITHM = "HS256"
 init_database()
