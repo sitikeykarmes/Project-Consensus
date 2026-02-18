@@ -2,9 +2,6 @@ from sqlalchemy.orm import Session
 from app.db.models import Message
 
 
-# -------------------------
-# Save Message
-# -------------------------
 def save_message(
     db: Session,
     group_id: str,
@@ -12,6 +9,7 @@ def save_message(
     sender_name: str,
     sender_type: str,
     content: str,
+    metadata: str = None,
 ):
     msg = Message(
         group_id=group_id,
@@ -19,6 +17,7 @@ def save_message(
         sender_name=sender_name,
         sender_type=sender_type,
         content=content,
+        metadata=metadata,
     )
 
     db.add(msg)
@@ -28,13 +27,10 @@ def save_message(
     return msg
 
 
-# -------------------------
-# Load Recent Messages
-# -------------------------
 def load_recent_messages(
     db: Session,
     group_id: str,
-    limit: int = 20
+    limit: int = 50
 ):
     return (
         db.query(Message)
