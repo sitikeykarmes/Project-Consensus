@@ -95,7 +95,7 @@ class Message(Base):
     sender_type = Column(String, default="user")  # user / agent / system
 
     content = Column(Text, nullable=False)
-    metadata = Column(Text, nullable=True)  # JSON string for agent_responses, mode etc.
+    extra_data = Column(Text, nullable=True)  # JSON string for agent_responses, mode etc.
 
     timestamp = Column(DateTime, default=datetime.utcnow)
 
