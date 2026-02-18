@@ -1,0 +1,104 @@
+{
+  "project_name": "AgentChat_Pro_Upgrade",
+  "design_philosophy": {
+    "theme": "Dark Forest Executive",
+    "core_concept": "Professional Team Chat meets WhatsApp Polish",
+    "visual_style": "Glassmorphism + Deep Matte Backgrounds + Neon Accents for AI",
+    "font_family": "Inter, system-ui, sans-serif"
+  },
+  "colors": {
+    "background": {
+      "app": "#0b141a",
+      "sidebar": "#111b21",
+      "chat_panel": "#0b141a",
+      "message_user": "#005c4b",
+      "message_agent": "#202c33",
+      "message_consensus": "#1f2c34",
+      "input_bar": "#202c33"
+    },
+    "text": {
+      "primary": "#e9edef",
+      "secondary": "#8696a0",
+      "accent": "#00a884",
+      "consensus_accent": "#FFD700"
+    },
+    "borders": {
+      "default": "#2a3942",
+      "highlight": "#00a884"
+    }
+  },
+  "components": {
+    "Sidebar": {
+      "description": "Professional team sidebar with glass header and active states.",
+      "styles": {
+        "container": "w-[30%] min-w-[320px] bg-[#111b21] border-r border-[#2a3942] flex flex-col",
+        "header": "h-16 px-4 bg-[#202c33] flex items-center justify-between shadow-sm",
+        "item": "flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#202c33] transition-colors border-b border-[#2a3942]/50",
+        "item_active": "bg-[#2a3942] border-l-4 border-[#00a884]",
+        "avatar": "w-12 h-12 rounded-full bg-[#6a7175] flex items-center justify-center text-xl text-white font-bold"
+      }
+    },
+    "ChatWindow": {
+      "description": "Immersive chat area with subtle background pattern.",
+      "styles": {
+        "container": "flex-1 flex flex-col bg-[#0b141a] relative",
+        "background_pattern": "opacity-5 pointer-events-none absolute inset-0 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')]",
+        "header": "h-16 bg-[#202c33] px-4 flex items-center gap-4 shadow-md z-10"
+      }
+    },
+    "MessageBubble": {
+      "description": "Distinct styles for User, Agent, and Consensus.",
+      "variants": {
+        "User": {
+          "container": "bg-[#005c4b] text-[#e9edef] rounded-lg rounded-tr-none shadow-sm max-w-[65%]",
+          "text": "text-sm leading-relaxed"
+        },
+        "Agent": {
+          "container": "bg-[#202c33] text-[#e9edef] rounded-lg rounded-tl-none border border-[#2a3942] shadow-sm max-w-[65%]",
+          "text": "text-sm leading-relaxed font-light"
+        },
+        "Consensus": {
+          "container": "bg-[#1f2c34] border border-[#FFD700]/30 shadow-[0_0_15px_rgba(255,215,0,0.1)] rounded-xl w-[80%] mx-auto my-4",
+          "header": "flex items-center gap-2 px-4 py-2 border-b border-[#FFD700]/20 bg-[#FFD700]/5 text-[#FFD700] font-bold text-xs uppercase tracking-wider",
+          "body": "p-4 text-[#e9edef] text-base font-medium",
+          "dropdown_trigger": "w-full py-2 text-xs text-[#8696a0] hover:text-[#e9edef] flex items-center justify-center gap-2 cursor-pointer transition-colors bg-[#111b21]/50 rounded-b-xl"
+        }
+      }
+    },
+    "InputArea": {
+      "description": "Modern floating input bar.",
+      "styles": {
+        "container": "px-4 py-3 bg-[#202c33] flex items-center gap-2",
+        "input": "flex-1 bg-[#2a3942] text-[#e9edef] rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#00a884] placeholder-[#8696a0]",
+        "button": "p-3 bg-[#00a884] hover:bg-[#008f6f] text-white rounded-lg transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+      }
+    },
+    "TypingIndicator": {
+      "description": "Smooth 3-dot animation in a glass bubble.",
+      "styles": {
+        "container": "bg-[#202c33] px-4 py-3 rounded-xl rounded-tl-none w-fit flex gap-1 items-center shadow-sm border border-[#2a3942]",
+        "dot": "w-2 h-2 bg-[#8696a0] rounded-full animate-bounce"
+      }
+    }
+  },
+  "visual_enhancers": {
+    "glass_panel": "backdrop-blur-md bg-white/5 border border-white/10 shadow-xl",
+    "neon_glow": "shadow-[0_0_10px_rgba(0,168,132,0.4)]",
+    "gold_glow": "shadow-[0_0_10px_rgba(255,215,0,0.2)]"
+  },
+  "assets": {
+    "icons": [
+      "User", "Users", "Bot", "BrainCircuit", "Check", "ChevronDown", "ChevronUp", 
+      "LogOut", "Plus", "Send", "Loader2", "MoreVertical", "Search", "MessageSquare"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Install 'framer-motion', 'clsx', 'tailwind-merge' immediately.",
+    "Refactor 'MessageBubble.jsx' into separate sub-components: 'UserMessage', 'AgentMessage', 'ConsensusMessage'.",
+    "Implement 'ConsensusMessage' using a Collapsible pattern (state: isOpen) to show/hide detailed agent thoughts if available.",
+    "Update 'ChatWindow.jsx' to group consecutive 'agent' messages under a 'Consensus' block if logical, OR simply make the Consensus message a standalone summary with an expandable 'Show Reasoning' section.",
+    "Replace all hardcoded colors with the palette variables defined above (or use Tailwind arbitrary values consistent with the palette).",
+    "Add 'framer-motion' layout animations for smooth message insertion.",
+    "Ensure the 'Consensus' message stands out visually as the 'Final Decision' (Gold/Amber theme)."
+  ]
+}
