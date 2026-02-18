@@ -71,7 +71,7 @@ class ChatPlatformTester:
         success, response = self.run_test(
             "Signup User",
             "POST",
-            f"auth/signup?email={email}&password={password}",
+            f"api/auth/signup?email={email}&password={password}",
             200
         )
         return success
@@ -92,7 +92,7 @@ class ChatPlatformTester:
         success, response = self.run_test(
             "Login User",
             "POST",
-            "auth/login",
+            "api/auth/login",
             200,
             data=form_data,
             headers=headers_without_json
