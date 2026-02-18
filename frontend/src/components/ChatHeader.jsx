@@ -12,7 +12,7 @@ export default function ChatHeader({ group, connected }) {
     const token = localStorage.getItem("token");
     if (!token || !group?.id) return;
     try {
-      const res = await fetch(`${BASE_URL}/groups/${group.id}/members`, {
+      const res = await fetch(`${BASE_URL}/api/groups/${group.id}/members`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
