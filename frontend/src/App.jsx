@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import Login from "./pages/Login";
-import { fetchGroups } from "./api/chatApi";
+import { fetchGroups } from "./api/chatApi.js";
 
 export default function App() {
   const [user, setUser] = useState(null);
