@@ -1,9 +1,16 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, BrainCircuit, Bot, User, Sparkles } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  BrainCircuit,
+  Bot,
+  User,
+  Sparkles,
+} from "lucide-react";
 
 function getModeLabel(mode) {
   const labels = {
-    independent: "Comparison Mode",
+    independent: "Independent Mode",
     support: "Supplement Mode",
     opposition: "Debate Mode",
   };
@@ -27,7 +34,10 @@ function ConsensusMessage({ msg }) {
   const modeColor = getModeColor(modeUsed);
 
   return (
-    <div data-testid="consensus-message" className="flex justify-center msg-enter">
+    <div
+      data-testid="consensus-message"
+      className="flex justify-center msg-enter"
+    >
       <div
         className="w-full max-w-[85%] rounded-xl overflow-hidden consensus-glow"
         style={{
@@ -52,7 +62,14 @@ function ConsensusMessage({ msg }) {
             >
               AI Consensus
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: `${modeColor}22`, color: modeColor, border: `1px solid ${modeColor}44` }}>
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+              style={{
+                background: `${modeColor}22`,
+                color: modeColor,
+                border: `1px solid ${modeColor}44`,
+              }}
+            >
               {getModeLabel(modeUsed)}
             </span>
           </div>
@@ -60,12 +77,21 @@ function ConsensusMessage({ msg }) {
 
         {/* Consensus Body */}
         <div className="px-4 py-3">
-          <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "#e9edef" }}>
+          <p
+            className="text-sm leading-relaxed whitespace-pre-line"
+            style={{ color: "#e9edef" }}
+          >
             {msg.content}
           </p>
           {msg.timestamp && (
-            <p className="text-[10px] mt-2 text-right" style={{ color: "#8696a0" }}>
-              {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            <p
+              className="text-[10px] mt-2 text-right"
+              style={{ color: "#8696a0" }}
+            >
+              {new Date(msg.timestamp).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </p>
           )}
         </div>
@@ -85,7 +111,9 @@ function ConsensusMessage({ msg }) {
             >
               <Bot size={14} />
               <span className="text-xs font-medium">
-                {expanded ? "Hide agent responses" : `See all responses (${agentResponses.length})`}
+                {expanded
+                  ? "Hide agent responses"
+                  : `See all responses (${agentResponses.length})`}
               </span>
               {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
@@ -116,11 +144,17 @@ function ConsensusMessage({ msg }) {
                       >
                         {idx + 1}
                       </div>
-                      <span className="text-xs font-semibold" style={{ color: "#e9edef" }}>
+                      <span
+                        className="text-xs font-semibold"
+                        style={{ color: "#e9edef" }}
+                      >
                         {resp.agent_name || `Agent ${idx + 1}`}
                       </span>
                     </div>
-                    <p className="text-xs leading-relaxed whitespace-pre-line" style={{ color: "#8696a0" }}>
+                    <p
+                      className="text-xs leading-relaxed whitespace-pre-line"
+                      style={{ color: "#8696a0" }}
+                    >
                       {resp.content}
                     </p>
                   </div>
@@ -135,10 +169,12 @@ function ConsensusMessage({ msg }) {
 }
 
 function UserMessage({ msg, isCurrentUser }) {
-  const senderLabel = isCurrentUser ? "You" : (msg.sender_name || "User");
+  const senderLabel = isCurrentUser ? "You" : msg.sender_name || "User";
 
   return (
-    <div className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} msg-enter`}>
+    <div
+      className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} msg-enter`}
+    >
       <div
         data-testid={isCurrentUser ? "user-own-message" : "user-other-message"}
         className="max-w-[65%] px-4 py-2 rounded-xl shadow-sm"
@@ -150,16 +186,30 @@ function UserMessage({ msg, isCurrentUser }) {
         }}
       >
         {!isCurrentUser && (
-          <p className="text-[11px] font-semibold mb-0.5" style={{ color: "#00a884" }}>
+          <p
+            className="text-[11px] font-semibold mb-0.5"
+            style={{ color: "#00a884" }}
+          >
             {senderLabel}
           </p>
         )}
-        <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "#e9edef" }}>
+        <p
+          className="text-sm leading-relaxed whitespace-pre-line"
+          style={{ color: "#e9edef" }}
+        >
           {msg.content}
         </p>
         {msg.timestamp && (
-          <p className="text-[10px] mt-1 text-right" style={{ color: isCurrentUser ? "rgba(255,255,255,0.5)" : "#8696a0" }}>
-            {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          <p
+            className="text-[10px] mt-1 text-right"
+            style={{
+              color: isCurrentUser ? "rgba(255,255,255,0.5)" : "#8696a0",
+            }}
+          >
+            {new Date(msg.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </p>
         )}
       </div>

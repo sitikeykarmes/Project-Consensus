@@ -2,16 +2,31 @@ import { useState } from "react";
 import { LogOut, Plus, MessageSquare, Search } from "lucide-react";
 import CreateGroupModal from "./CreateGroupModal";
 
-export default function Sidebar({ groups, activeGroup, setActiveGroup, reloadGroups, user, logout }) {
+export default function Sidebar({
+  groups,
+  activeGroup,
+  setActiveGroup,
+  reloadGroups,
+  user,
+  logout,
+}) {
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
 
-  const filtered = groups?.filter((g) =>
-    g.name.toLowerCase().includes(search.toLowerCase())
-  ) || [];
+  const filtered =
+    groups?.filter((g) =>
+      g.name.toLowerCase().includes(search.toLowerCase()),
+    ) || [];
 
   function getInitials(name) {
-    return name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "GC";
+    return (
+      name
+        ?.split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase() || "GC"
+    );
   }
 
   return (
@@ -31,10 +46,16 @@ export default function Sidebar({ groups, activeGroup, setActiveGroup, reloadGro
         style={{ background: "#202c33" }}
       >
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "#00a884", color: "#fff" }}>
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+            style={{ background: "#00a884", color: "#fff" }}
+          >
             {user?.email?.[0]?.toUpperCase() || "U"}
           </div>
-          <span className="text-sm font-medium truncate max-w-[140px]" style={{ color: "#e9edef" }}>
+          <span
+            className="text-sm font-medium truncate max-w-[140px]"
+            style={{ color: "#e9edef" }}
+          >
             {user?.email}
           </span>
         </div>
@@ -61,17 +82,31 @@ export default function Sidebar({ groups, activeGroup, setActiveGroup, reloadGro
       </div>
 
       {/* Search */}
-      <div className="px-3 py-2" style={{ background: "#111b21" }}>
-        <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#8696a0" }} />
+      {/* Search */}
+      <div className="px-4 py-3" style={{ background: "#111b21" }}>
+        <div className="relative flex items-center">
+          {/* Icon */}
+          <Search
+            size={18}
+            className="absolute left-4"
+            style={{ color: "#8696a0" }}
+          />
+
+          {/* Input */}
           <input
-            data-testid="group-search-input"
             type="text"
             placeholder="Search groups..."
-            className="w-full pl-9 pr-4 py-2 rounded-lg text-sm focus:outline-none"
-            style={{ background: "#202c33", color: "#e9edef", border: "none" }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="w-full h-10 rounded-xl text-sm focus:outline-none"
+            style={{
+              background: "#202c33",
+              color: "#e9edef",
+
+              /* 🔥 Force padding so text starts AFTER icon */
+              paddingLeft: "48px",
+              paddingRight: "14px",
+            }}
           />
         </div>
       </div>
@@ -89,7 +124,9 @@ export default function Sidebar({ groups, activeGroup, setActiveGroup, reloadGro
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-all"
                 style={{
                   background: isActive ? "#2a3942" : "transparent",
-                  borderLeft: isActive ? "3px solid #00a884" : "3px solid transparent",
+                  borderLeft: isActive
+                    ? "3px solid #00a884"
+                    : "3px solid transparent",
                   borderBottom: "1px solid rgba(42,57,66,0.5)",
                 }}
               >
@@ -100,10 +137,16 @@ export default function Sidebar({ groups, activeGroup, setActiveGroup, reloadGro
                   {getInitials(group.name)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate" style={{ color: "#e9edef" }}>
+                  <p
+                    className="text-sm font-semibold truncate"
+                    style={{ color: "#e9edef" }}
+                  >
                     {group.name}
                   </p>
-                  <p className="text-xs truncate mt-0.5" style={{ color: "#8696a0" }}>
+                  <p
+                    className="text-xs truncate mt-0.5"
+                    style={{ color: "#8696a0" }}
+                  >
                     {group.agents?.length || 0} agents
                   </p>
                 </div>
@@ -112,7 +155,11 @@ export default function Sidebar({ groups, activeGroup, setActiveGroup, reloadGro
           })
         ) : (
           <div className="text-center mt-8 px-4">
-            <MessageSquare size={32} className="mx-auto mb-2" style={{ color: "#2a3942" }} />
+            <MessageSquare
+              size={32}
+              className="mx-auto mb-2"
+              style={{ color: "#2a3942" }}
+            />
             <p className="text-sm" style={{ color: "#8696a0" }}>
               {search ? "No groups found" : "No groups yet"}
             </p>
@@ -128,7 +175,10 @@ export default function Sidebar({ groups, activeGroup, setActiveGroup, reloadGro
       </div>
 
       {showModal && (
-        <CreateGroupModal close={() => setShowModal(false)} reloadGroups={reloadGroups} />
+        <CreateGroupModal
+          close={() => setShowModal(false)}
+          reloadGroups={reloadGroups}
+        />
       )}
     </div>
   );
