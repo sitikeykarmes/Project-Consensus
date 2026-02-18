@@ -23,7 +23,7 @@ export async function fetchAgents() {
 }
 
 export async function createGroup(groupData) {
-  const res = await fetch(`${BASE_URL}/api/groups`, {
+  const res = await fetch(`${BASE_URL}/api/groups/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(groupData),
