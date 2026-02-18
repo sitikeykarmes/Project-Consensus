@@ -7,7 +7,7 @@ class IntentClassifier:
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
         self.model = "llama-3.3-70b-versatile"
     
-    def classify(self, user_query: str) -> str:
+    def classify(self, user_query: str, context: str = "") -> str:
         """
         Classifies user intent into one of three multi-agent orchestration modes:
         - independent (Comparison Mode): Parallel diverse perspectives
@@ -176,9 +176,9 @@ No explanation, no punctuation, just the mode name."""
                 model=self.model,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Classify this query: {user_query}"}
+                    {"role": "user", "content": f"{'Previous context:\n' + context + '\n\n' if context else ''}Classify this query: {user_query}"}
                 ],
-                temperature=0.0,  # Deterministic classification
+                temperature=0.0,
                 max_tokens=10
             )
             
