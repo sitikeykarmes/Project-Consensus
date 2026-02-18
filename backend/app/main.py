@@ -200,7 +200,7 @@ def build_conversation_history(room_id: str, limit: int = 10) -> list:
         db.close()
 
 
-@app.websocket("/ws/{room_id}")
+@app.websocket("/api/ws/{room_id}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str):
     token = websocket.query_params.get("token")
     if not token:
