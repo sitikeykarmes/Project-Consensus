@@ -71,7 +71,7 @@ export default function CreateGroupModal({ close, reloadGroups }) {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${BASE_URL}/groups/create`, {
+      const res = await fetch(`${BASE_URL}/api/groups/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
