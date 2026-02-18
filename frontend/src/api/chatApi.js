@@ -1,7 +1,7 @@
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export async function fetchGroups(token) {
-  const res = await fetch(`${BASE_URL}/groups/my`, {
+  const res = await fetch(`${BASE_URL}/api/groups/my`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
