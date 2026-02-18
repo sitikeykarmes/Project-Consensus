@@ -176,7 +176,8 @@ No explanation, no punctuation, just the mode name."""
                 model=self.model,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"{'Previous context:\n' + context + '\n\n' if context else ''}Classify this query: {user_query}"}
+                context_prefix = "Previous context:\n" + context + "\n\n" if context else ""
+                    {"role": "user", "content": f"{context_prefix}Classify this query: {user_query}"}
                 ],
                 temperature=0.0,
                 max_tokens=10
