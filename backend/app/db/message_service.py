@@ -17,7 +17,7 @@ def save_message(
         sender_name=sender_name,
         sender_type=sender_type,
         content=content,
-        metadata=metadata,
+        extra_data=metadata,
     )
 
     db.add(msg)

@@ -227,9 +227,9 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 "timestamp": msg.timestamp.isoformat(),
             }
             # If it's a consensus message, try to parse metadata
-            if msg.sender_type == "consensus" and msg.metadata:
+            if msg.sender_type == "consensus" and msg.extra_data:
                 try:
-                    meta = json.loads(msg.metadata)
+                    meta = json.loads(msg.extra_data)
                     msg_data["mode_used"] = meta.get("mode_used", "")
                     msg_data["agent_responses"] = meta.get("agent_responses", [])
                 except:
