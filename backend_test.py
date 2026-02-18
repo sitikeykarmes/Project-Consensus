@@ -134,7 +134,7 @@ class ChatPlatformTester:
         success, response = self.run_test(
             "Get My Groups",
             "GET",
-            "groups/my",
+            "api/groups/my",
             200
         )
         return success
@@ -154,13 +154,13 @@ class ChatPlatformTester:
         success, response = self.run_test(
             "Create Group with Agents",
             "POST",
-            "groups/create",
+            "api/groups/create",
             200,
             data=group_data
         )
         
-        if success and 'id' in response:
-            group_id = response['id']
+        if success and 'group' in response and 'id' in response['group']:
+            group_id = response['group']['id']
             print(f"📋 Created group with ID: {group_id}")
             return group_id
         return None
