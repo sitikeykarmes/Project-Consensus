@@ -10,7 +10,7 @@ from app.db.models import Group, GroupMember, User
 from app.auth.dependencies import get_current_user
 
 
-router = APIRouter(prefix="/groups", tags=["Groups"])
+router = APIRouter(prefix="/api/groups", tags=["Groups"])
 
 
 
