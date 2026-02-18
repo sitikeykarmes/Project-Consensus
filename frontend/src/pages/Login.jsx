@@ -55,7 +55,7 @@ export default function Login({ setUser }) {
 
     try {
       const res = await fetch(
-        `${BASE_URL}/auth/signup?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+        `${BASE_URL}/api/auth/signup?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
         { method: "POST" }
       );
 
