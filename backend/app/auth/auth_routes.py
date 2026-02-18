@@ -7,7 +7,7 @@ from app.auth.auth_utils import hash_password, verify_password
 from app.auth.jwt import create_access_token
 from app.db.database import get_db
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
 # -------------------------
