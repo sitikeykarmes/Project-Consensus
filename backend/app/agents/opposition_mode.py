@@ -12,6 +12,7 @@ Rules:
 - Write essays, give long tables, bullet lists, etc. only when the user explicitly asks for it.
 - Only key point per message.
 - Speak naturally like ChatGPT/Gemini in a group.
+- If conversation context is provided, use it to give more relevant answers.
 """
 
 
@@ -19,26 +20,24 @@ class OppositionMode:
     def __init__(self):
         self.client = LLMAgentClient()
 
-    # ----------------------------
-    # Agent 1: Generator
-    # ----------------------------
-    def generator_agent(self, user_query: str) -> str:
+    def generator_agent(self, user_query: str, context: str = "") -> str:
+        context_block = ""
+        if context:
+            context_block = f"\n\nPrevious conversation context:\n{context}\n\nNow answer:"
         messages = [
             {
                 "role": "system",
                 "content": CHAT_RULES
                 + "\nRole: Agent 1 (Generator). Give an initial short answer."
             },
-            {"role": "user", "content": user_query},
+            {"role": "user", "content": f"{context_block}\n{user_query}"},
         ]
-        return self.client.get_completion(
-            "agent1", messages, temperature=0.7, max_tokens=120
-        )
+        return self.client.get_completion("agent1", messages, temperature=0.7, max_tokens=120)
 
-    # ----------------------------
-    # Agent 2: Critic
-    # ----------------------------
-    def critic_agent(self, user_query: str, generator_text: str) -> str:
+    def critic_agent(self, user_query: str, generator_text: str, context: str = "") -> str:
+        context_block = ""
+        if context:
+            context_block = f"\nPrevious conversation context:\n{context}\n"
         messages = [
             {
                 "role": "system",
@@ -47,7 +46,7 @@ class OppositionMode:
             },
             {
                 "role": "user",
-                "content": f"""
+                "content": f"""{context_block}
 User Query: {user_query}
 
 Agent 1 said:
@@ -57,14 +56,12 @@ Reply with short correction or disagreement.
 """,
             },
         ]
-        return self.client.get_completion(
-            "agent2", messages, temperature=0.4, max_tokens=90
-        )
+        return self.client.get_completion("agent2", messages, temperature=0.4, max_tokens=90)
 
-    # ----------------------------
-    # Agent 3: Referee / Verifier
-    # ----------------------------
-    def referee_agent(self, user_query: str, gen: str, critic: str) -> str:
+    def referee_agent(self, user_query: str, gen: str, critic: str, context: str = "") -> str:
+        context_block = ""
+        if context:
+            context_block = f"\nPrevious conversation context:\n{context}\n"
         messages = [
             {
                 "role": "system",
@@ -80,7 +77,7 @@ If debate is settled, say: VERDICT REACHED
             },
             {
                 "role": "user",
-                "content": f"""
+                "content": f"""{context_block}
 User Query: {user_query}
 
 Agent 1 answer:
@@ -93,14 +90,12 @@ Give a short referee verdict.
 """,
             },
         ]
-        return self.client.get_completion(
-            "agent3", messages, temperature=0.3, max_tokens=110
-        )
+        return self.client.get_completion("agent3", messages, temperature=0.3, max_tokens=110)
 
-    # ----------------------------
-    # Agent 1: Final Update after referee
-    # ----------------------------
-    def generator_update(self, user_query: str, referee_note: str) -> str:
+    def generator_update(self, user_query: str, referee_note: str, context: str = "") -> str:
+        context_block = ""
+        if context:
+            context_block = f"\nPrevious conversation context:\n{context}\n"
         messages = [
             {
                 "role": "system",
@@ -109,7 +104,7 @@ Give a short referee verdict.
             },
             {
                 "role": "user",
-                "content": f"""
+                "content": f"""{context_block}
 User Query: {user_query}
 
 Referee feedback:
@@ -119,51 +114,38 @@ Now rewrite your answer in 2-3 lines.
 """,
             },
         ]
-        return self.client.get_completion(
-            "agent1", messages, temperature=0.6, max_tokens=100
-        )
+        return self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=100)
 
-    # ----------------------------
-    # Main Debate Runner
-    # ----------------------------
-    def run(self, user_query: str) -> dict:
-        print("🤖 Running Opposition Mode Debate (3-Agent)...")
-
+    def run(self, user_query: str, context: str = "") -> dict:
+        print("Running Opposition Mode Debate (3-Agent)...")
         responses = []
 
-        # Step 1: Initial generator answer
-        generator_text = self.generator_agent(user_query)
+        generator_text = self.generator_agent(user_query, context)
         responses.append({
             "agent_name": "Generator (Agent 1)",
             "content": generator_text,
             "mode": "opposition"
         })
 
-        # Debate loop (max 5 rounds)
         for round_no in range(1, 6):
-
-            # Step 2: Critic responds
-            critic_text = self.critic_agent(user_query, generator_text)
+            critic_text = self.critic_agent(user_query, generator_text, context)
             responses.append({
                 "agent_name": f"Critic (Agent 2) Round {round_no}",
                 "content": critic_text,
                 "mode": "opposition"
             })
 
-            # Step 3: Referee verifies
-            referee_text = self.referee_agent(user_query, generator_text, critic_text)
+            referee_text = self.referee_agent(user_query, generator_text, critic_text, context)
             responses.append({
                 "agent_name": f"Referee (Agent 3) Round {round_no}",
                 "content": referee_text,
                 "mode": "opposition"
             })
 
-            # Early stopping if verdict reached
             if "verdict reached" in referee_text.lower():
                 break
 
-            # Step 4: Generator updates answer
-            generator_text = self.generator_update(user_query, referee_text)
+            generator_text = self.generator_update(user_query, referee_text, context)
             responses.append({
                 "agent_name": f"Generator Update Round {round_no}",
                 "content": generator_text,
