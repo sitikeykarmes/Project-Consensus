@@ -36,5 +36,5 @@ export function getWsUrl(roomId, token) {
   const backendUrl = BASE_URL || window.location.origin;
   const wsProtocol = backendUrl.startsWith("https") ? "wss" : "ws";
   const host = backendUrl.replace(/^https?:\/\//, "");
-  return `${wsProtocol}://${host}/ws/${roomId}?token=${token}`;
+  return `${wsProtocol}://${host}/api/ws/${roomId}?token=${token}`;
 }
