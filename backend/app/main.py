@@ -169,12 +169,13 @@ def resolve_agent_id(agent_name: str) -> str | None:
 
 def build_conversation_history(room_id: str, limit: int = 10) -> list:
     """Load recent messages from DB and format as conversation history for AI context."""
+    from app.db.models import Message as MessageModel
     db = SessionLocal()
     try:
         messages = (
-            db.query(__import__('app.db.models', fromlist=['Message']).Message)
-            .filter(__import__('app.db.models', fromlist=['Message']).Message.group_id == room_id)
-            .order_by(__import__('app.db.models', fromlist=['Message']).Message.timestamp.desc())
+            db.query(MessageModel)
+            .filter(MessageModel.group_id == room_id)
+            .order_by(MessageModel.timestamp.desc())
             .limit(limit)
             .all()
         )
