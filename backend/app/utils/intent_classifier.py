@@ -172,11 +172,11 @@ Respond with EXACTLY ONE WORD (lowercase): independent, support, or opposition
 No explanation, no punctuation, just the mode name."""
 
         try:
+            context_prefix = ("Previous context:\n" + context + "\n\n") if context else ""
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                context_prefix = "Previous context:\n" + context + "\n\n" if context else ""
                     {"role": "user", "content": f"{context_prefix}Classify this query: {user_query}"}
                 ],
                 temperature=0.0,
