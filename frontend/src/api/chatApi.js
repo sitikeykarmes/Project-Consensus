@@ -1,14 +1,13 @@
-const BASE_URL = "http://localhost:8001";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export async function fetchGroups(token) {
-  const res = await fetch("http://localhost:8001/groups/my", {
+  const res = await fetch(`${BASE_URL}/groups/my`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  // ✅ Handle Unauthorized
   if (!res.ok) {
     const err = await res.json();
     console.error("Fetch Groups Error:", err);
@@ -31,4 +30,11 @@ export async function createGroup(groupData) {
   });
 
   return res.json();
+}
+
+export function getWsUrl(roomId, token) {
+  const backendUrl = BASE_URL || window.location.origin;
+  const wsProtocol = backendUrl.startsWith("https") ? "wss" : "ws";
+  const host = backendUrl.replace(/^https?:\/\//, "");
+  return `${wsProtocol}://${host}/ws/${roomId}?token=${token}`;
 }
