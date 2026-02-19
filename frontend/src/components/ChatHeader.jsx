@@ -29,7 +29,14 @@ export default function ChatHeader({ group, connected }) {
   }, [group?.id]);
 
   function getInitials(name) {
-    return name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "GC";
+    return (
+      name
+        ?.split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase() || "GC"
+    );
   }
 
   return (
@@ -50,7 +57,10 @@ export default function ChatHeader({ group, connected }) {
             <p className="text-sm font-semibold" style={{ color: "#e9edef" }}>
               {group.name}
             </p>
-            <div className="flex items-center gap-3 text-[11px]" style={{ color: "#8696a0" }}>
+            <div
+              className="flex items-center gap-3 text-[11px]"
+              style={{ color: "#8696a0" }}
+            >
               <span className="flex items-center gap-1">
                 <Bot size={11} /> {group.agents?.length || 0} agents
               </span>
@@ -77,10 +87,14 @@ export default function ChatHeader({ group, connected }) {
         <button
           data-testid="add-members-button"
           onClick={() => setShowAddMembers(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-          style={{ background: "#2a3942", color: "#8696a0", border: "1px solid #2a3942" }}
+          className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-all"
+          style={{
+            background: "#2a3942",
+            color: "#8696a0",
+            border: "1px solid #2a3942",
+          }}
         >
-          <UserPlus size={14} />
+          <UserPlus size={15} />
           Add Members
         </button>
       </div>

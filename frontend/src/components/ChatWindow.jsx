@@ -95,10 +95,10 @@ export default function ChatWindow({ group, user }) {
     >
       {/* WhatsApp background pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.08] pointer-events-none"
         style={{
           backgroundImage:
-            "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')",
+            "url('./bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png')",
           backgroundRepeat: "repeat",
         }}
       />

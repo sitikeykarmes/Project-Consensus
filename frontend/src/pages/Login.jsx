@@ -56,7 +56,7 @@ export default function Login({ setUser }) {
     try {
       const res = await fetch(
         `${BASE_URL}/api/auth/signup?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
-        { method: "POST" }
+        { method: "POST" },
       );
 
       const data = await res.json();
@@ -85,16 +85,26 @@ export default function Login({ setUser }) {
     <div
       data-testid="login-page"
       className="h-screen w-screen flex items-center justify-center"
-      style={{ background: "linear-gradient(135deg, #0b141a 0%, #111b21 50%, #0b141a 100%)" }}
+      style={{
+        background:
+          "linear-gradient(135deg, #0b141a 0%, #111b21 50%, #0b141a 100%)",
+      }}
     >
       <div className="w-full max-w-[420px] mx-4">
         {/* Logo / Branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4" style={{ background: "#00a884" }}>
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            style={{ background: "#00a884" }}
+          >
             <Zap size={32} color="#fff" />
           </div>
-          <h1 className="text-2xl font-bold" style={{ color: "#e9edef" }}>AgentChat</h1>
-          <p className="text-sm mt-1" style={{ color: "#8696a0" }}>Multi-Agent AI Collaboration</p>
+          <h1 className="text-2xl font-bold" style={{ color: "#e9edef" }}>
+            Consensus
+          </h1>
+          <p className="text-sm mt-1" style={{ color: "#8696a0" }}>
+            Multi-Agent AI Collaboration
+          </p>
         </div>
 
         {/* Card */}
@@ -102,7 +112,10 @@ export default function Login({ setUser }) {
           className="rounded-2xl p-8 shadow-2xl"
           style={{ background: "#202c33", border: "1px solid #2a3942" }}
         >
-          <h2 className="text-lg font-semibold mb-6" style={{ color: "#e9edef" }}>
+          <h2
+            className="text-lg font-semibold mb-6"
+            style={{ color: "#e9edef" }}
+          >
             {isSignup ? "Create Account" : "Welcome Back"}
           </h2>
 
@@ -110,7 +123,11 @@ export default function Login({ setUser }) {
             <div
               data-testid="login-error"
               className="mb-4 px-4 py-2 rounded-lg text-sm"
-              style={{ background: "rgba(239,68,68,0.15)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.3)" }}
+              style={{
+                background: "rgba(239,68,68,0.15)",
+                color: "#ef4444",
+                border: "1px solid rgba(239,68,68,0.3)",
+              }}
             >
               {error}
             </div>
@@ -118,7 +135,11 @@ export default function Login({ setUser }) {
 
           <div className="space-y-4">
             <div className="relative">
-              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#8696a0" }} />
+              <Mail
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2"
+                style={{ color: "#8696a0" }}
+              />
               <input
                 data-testid="login-email-input"
                 type="email"
@@ -137,7 +158,11 @@ export default function Login({ setUser }) {
             </div>
 
             <div className="relative">
-              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#8696a0" }} />
+              <Lock
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2"
+                style={{ color: "#8696a0" }}
+              />
               <input
                 data-testid="login-password-input"
                 type="password"
@@ -175,11 +200,16 @@ export default function Login({ setUser }) {
           <div className="mt-6 text-center">
             <button
               data-testid="toggle-auth-mode"
-              onClick={() => { setIsSignup(!isSignup); setError(""); }}
+              onClick={() => {
+                setIsSignup(!isSignup);
+                setError("");
+              }}
               className="text-sm transition-colors"
               style={{ color: "#00a884" }}
             >
-              {isSignup ? "Already have an account? Log in" : "Don't have an account? Sign up"}
+              {isSignup
+                ? "Already have an account? Log in"
+                : "Don't have an account? Sign up"}
             </button>
           </div>
         </div>
@@ -191,7 +221,11 @@ export default function Login({ setUser }) {
             { icon: Bot, label: "AI Agents" },
             { icon: Zap, label: "Real-time" },
           ].map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-1.5 text-xs" style={{ color: "#8696a0" }}>
+            <div
+              key={label}
+              className="flex items-center gap-1.5 text-xs"
+              style={{ color: "#8696a0" }}
+            >
               <Icon size={14} style={{ color: "#00a884" }} />
               {label}
             </div>

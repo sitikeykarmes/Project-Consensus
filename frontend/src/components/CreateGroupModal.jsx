@@ -101,16 +101,28 @@ export default function CreateGroupModal({ close, reloadGroups }) {
   }
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center z-50" style={{ background: "rgba(0,0,0,0.6)" }}>
+    <div
+      className="fixed inset-0 flex justify-center items-center z-50"
+      style={{ background: "rgba(0,0,0,0.6)" }}
+    >
       <div
         data-testid="create-group-modal"
         className="w-[480px] max-h-[85vh] overflow-y-auto rounded-xl shadow-2xl"
         style={{ background: "#202c33", border: "1px solid #2a3942" }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid #2a3942" }}>
-          <h2 className="text-base font-semibold" style={{ color: "#e9edef" }}>Create New Group</h2>
-          <button onClick={close} className="p-1 rounded-lg" style={{ color: "#8696a0" }}>
+        <div
+          className="flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: "1px solid #2a3942" }}
+        >
+          <h2 className="text-base font-semibold" style={{ color: "#e9edef" }}>
+            Create New Group
+          </h2>
+          <button
+            onClick={close}
+            className="p-1 rounded-lg"
+            style={{ color: "#8696a0" }}
+          >
             <X size={18} />
           </button>
         </div>
@@ -118,12 +130,21 @@ export default function CreateGroupModal({ close, reloadGroups }) {
         <div className="px-5 py-4 space-y-5">
           {/* Group Name */}
           <div>
-            <label className="text-xs font-medium mb-1.5 block" style={{ color: "#8696a0" }}>Group Name</label>
+            <label
+              className="text-xs font-medium mb-1.5 block"
+              style={{ color: "#8696a0" }}
+            >
+              Group Name
+            </label>
             <input
               data-testid="group-name-input"
               className="w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-1"
               placeholder="Enter group name..."
-              style={{ background: "#2a3942", color: "#e9edef", border: "none" }}
+              style={{
+                background: "#2a3942",
+                color: "#e9edef",
+                border: "none",
+              }}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -131,7 +152,10 @@ export default function CreateGroupModal({ close, reloadGroups }) {
 
           {/* Agent Selection */}
           <div>
-            <label className="text-xs font-medium mb-2 flex items-center gap-1.5" style={{ color: "#8696a0" }}>
+            <label
+              className="text-xs font-medium mb-2 flex items-center gap-1.5"
+              style={{ color: "#8696a0" }}
+            >
               <Bot size={14} /> Select AI Agents
             </label>
             <div className="space-y-2">
@@ -141,7 +165,9 @@ export default function CreateGroupModal({ close, reloadGroups }) {
                   data-testid={`agent-checkbox-${agent.id}`}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all"
                   style={{
-                    background: selectedAgents.includes(agent.id) ? "rgba(0,168,132,0.1)" : "#2a3942",
+                    background: selectedAgents.includes(agent.id)
+                      ? "rgba(0,168,132,0.1)"
+                      : "#2a3942",
                     border: `1px solid ${selectedAgents.includes(agent.id) ? "#00a884" : "transparent"}`,
                   }}
                 >
@@ -151,10 +177,15 @@ export default function CreateGroupModal({ close, reloadGroups }) {
                     onChange={() => toggleAgent(agent.id)}
                     className="accent-[#00a884]"
                   />
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "#00a884", color: "#fff" }}>
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{ background: "#00a884", color: "#fff" }}
+                  >
                     {agent.avatar || "AI"}
                   </div>
-                  <span className="text-sm" style={{ color: "#e9edef" }}>{agent.name}</span>
+                  <span className="text-sm" style={{ color: "#e9edef" }}>
+                    {agent.name}
+                  </span>
                 </label>
               ))}
             </div>
@@ -162,7 +193,10 @@ export default function CreateGroupModal({ close, reloadGroups }) {
 
           {/* Members */}
           <div>
-            <label className="text-xs font-medium mb-2 flex items-center gap-1.5" style={{ color: "#8696a0" }}>
+            <label
+              className="text-xs font-medium mb-2 flex items-center gap-1.5"
+              style={{ color: "#8696a0" }}
+            >
               <Users size={14} /> Invite Members (Optional)
             </label>
             <div className="flex gap-2">
@@ -188,12 +222,22 @@ export default function CreateGroupModal({ close, reloadGroups }) {
             {memberEmails.length > 0 && (
               <div className="mt-2 space-y-1.5">
                 {memberEmails.map((email) => (
-                  <div key={email} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: "#2a3942" }}>
-                    <span className="text-xs flex items-center gap-1.5" style={{ color: "#e9edef" }}>
+                  <div
+                    key={email}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg"
+                    style={{ background: "#2a3942" }}
+                  >
+                    <span
+                      className="text-xs flex items-center gap-1.5"
+                      style={{ color: "#e9edef" }}
+                    >
                       <Mail size={12} style={{ color: "#8696a0" }} />
                       {email}
                     </span>
-                    <button onClick={() => removeMemberEmail(email)} style={{ color: "#ef4444" }}>
+                    <button
+                      onClick={() => removeMemberEmail(email)}
+                      style={{ color: "#ef4444" }}
+                    >
                       <X size={14} />
                     </button>
                   </div>
@@ -204,7 +248,10 @@ export default function CreateGroupModal({ close, reloadGroups }) {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-5 py-4" style={{ borderTop: "1px solid #2a3942" }}>
+        <div
+          className="flex justify-end gap-3 px-5 py-4"
+          style={{ borderTop: "1px solid #2a3942" }}
+        >
           <button
             data-testid="cancel-create-group"
             onClick={close}

@@ -132,7 +132,7 @@ initialize_default_groups()
 
 @app.get("/")
 def read_root():
-    return {"message": "WhatsApp-like Chat API is running"}
+    return {"message": "Consensus Chat API is running"}
 
 
 @app.get("/api/agents")
@@ -216,6 +216,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
     await manager.connect(websocket, room_id, user_email)
 
     # Load previous messages when user joins
+    # Load previous messages when user joins
     db = SessionLocal()
     try:
         recent_messages = load_recent_messages(db, room_id, limit=50)
@@ -227,7 +228,6 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 "content": msg.content,
                 "timestamp": msg.timestamp.isoformat(),
             }
-            # If it's a consensus message, try to parse metadata
             if msg.sender_type == "consensus" and msg.extra_data:
                 try:
                     meta = json.loads(msg.extra_data)
@@ -235,7 +235,11 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                     msg_data["agent_responses"] = meta.get("agent_responses", [])
                 except:
                     pass
-            await websocket.send_json(msg_data)
+            try:
+                await websocket.send_json(msg_data)
+            except Exception:
+                # Client disconnected before history finished sending — exit cleanly
+                return
     finally:
         db.close()
 

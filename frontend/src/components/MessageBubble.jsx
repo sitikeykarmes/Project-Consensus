@@ -34,12 +34,9 @@ function ConsensusMessage({ msg }) {
   const modeColor = getModeColor(modeUsed);
 
   return (
-    <div
-      data-testid="consensus-message"
-      className="flex justify-center msg-enter"
-    >
+    <div data-testid="consensus-message" className="flex msg-enter">
       <div
-        className="w-full max-w-[85%] rounded-xl overflow-hidden consensus-glow"
+        className="w-full max-w-[65%] rounded-xl overflow-hidden consensus-glow"
         style={{
           background: "#1f2c34",
           border: "1px solid rgba(255,215,0,0.25)",

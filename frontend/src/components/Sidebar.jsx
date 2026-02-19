@@ -63,7 +63,7 @@ export default function Sidebar({
           <button
             data-testid="create-group-button"
             onClick={() => setShowModal(true)}
-            className="p-2 rounded-lg transition-colors"
+            className="p-4 rounded-lg transition-colors"
             style={{ color: "#8696a0" }}
             title="New Group"
           >
@@ -72,7 +72,7 @@ export default function Sidebar({
           <button
             data-testid="logout-button"
             onClick={logout}
-            className="p-2 rounded-lg transition-colors"
+            className="p-4 rounded-lg transition-colors"
             style={{ color: "#8696a0" }}
             title="Logout"
           >
@@ -81,7 +81,6 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Search */}
       {/* Search */}
       <div className="px-4 py-3" style={{ background: "#111b21" }}>
         <div className="relative flex items-center">
@@ -121,14 +120,26 @@ export default function Sidebar({
                 key={group.id}
                 data-testid={`group-item-${group.id}`}
                 onClick={() => setActiveGroup(group)}
-                className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-all"
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-all rounded-xl mx-2 my-1"
                 style={{
-                  background: isActive ? "#2a3942" : "transparent",
-                  borderLeft: isActive
-                    ? "3px solid #00a884"
-                    : "3px solid transparent",
-                  borderBottom: "1px solid rgba(42,57,66,0.5)",
+                  background: isActive ? "#2a3942" : "#111b21",
+
+                  /* Space + card feel */
+                  border: isActive
+                    ? "1px solid #00a884"
+                    : "1px solid transparent",
+
+                  /* Smooth hover look */
+                  boxShadow: isActive ? "0 0 6px rgba(0,168,132,0.3)" : "none",
                 }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#202c33")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = isActive
+                    ? "#2a3942"
+                    : "#111b21")
+                }
               >
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
