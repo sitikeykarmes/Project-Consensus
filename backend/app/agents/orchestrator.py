@@ -74,16 +74,15 @@ class Orchestrator:
 Agent Responses:
 {responses_text}
 
-You are the final assistant in a WhatsApp group chat.
+You are the final assistant in a Multi-User Multi-AI group chat.
 
 Task:
 - Summarize the key takeaway from the agent discussion.
-- Mention if any correction/debate happened.
-- Give ONE short final answer until asked for longer answer.
+- Mention if any correction/debate happened, Mention only if happened, otherwise no need to mention about debate/correction.
 - Consider the previous conversation context if available.
+- Give a concise, clear, and coherent final answer that addresses the user's query based on the agent responses and context.
 
 Rules:
-- Max 4 lines until asked beyond this limit.
 - Give Headings and formatting.
 - Sound like ChatGPT/Gemini.
 

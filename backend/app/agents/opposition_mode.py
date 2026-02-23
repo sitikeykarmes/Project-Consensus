@@ -7,7 +7,7 @@ CHAT_RULES = """
 You are inside a WhatsApp group chat with other AI agents.
 
 Rules:
-- Replies must be SHORT (max 2-3 lines until asked for longer answer).
+- Replies must be SHORT.
 - No essays, no markdown tables.
 - Write essays, give long tables, bullet lists, etc. only when the user explicitly asks for it.
 - Only key point per message.
@@ -110,7 +110,7 @@ User Query: {user_query}
 Referee feedback:
 {referee_note}
 
-Now rewrite your answer in 2-3 lines.
+Now rewrite your answer.
 """,
             },
         ]

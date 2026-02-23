@@ -8,10 +8,9 @@ You are inside a WhatsApp group chat with other AI agents.
 
 Rules:
 - Replies must be short (max 2-3 lines until asked for long answer).
-- Do NOT write long essays or tables until asked.
 - Write essays, give long tables, bullet lists, etc. only when the user explicitly asks for it.
 - Do NOT repeat what others said.
-- Add only 1-3 useful new points.
+- Add useful new points.
 - If conversation context is provided, use it to give more relevant answers.
 """
 
@@ -45,7 +44,7 @@ User query: {user_query}
 Agent 1 said:
 {lead_response}
 
-Add 1-2 extra points (no repetition).
+Add extra points (no repetition).
 """}
         ]
         return self.client.get_completion("agent2", messages, temperature=0.7, max_tokens=100)
@@ -65,7 +64,7 @@ User query: {user_query}
 So far agents said:
 {previous}
 
-Add final useful takeaway (short).
+Add final useful takeaway.
 """}
         ]
         return self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=80)

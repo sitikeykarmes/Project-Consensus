@@ -85,7 +85,7 @@ class LLMAgentClient:
             # -----------------------------------------
             # Retry Attempts (4 total)
             # -----------------------------------------
-            token_boosts = [0, 50, 100,150]
+            token_boosts = [400,500,600,700]
 
             for attempt, boost in enumerate(token_boosts, start=1):
 
