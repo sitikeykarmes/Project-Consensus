@@ -56,7 +56,7 @@ Add extra points (no repetition).
         messages = [
             {"role": "system",
              "content": CHAT_RULES +
-                        "\nRole: Agent 3. Give a final practical takeaway or caution."},
+                        "\nRole: Agent 3. Give a extra final points which others agents might have missed."},
             {"role": "user",
              "content": f"""{context_block}
 User query: {user_query}
@@ -64,7 +64,7 @@ User query: {user_query}
 So far agents said:
 {previous}
 
-Add final useful takeaway.
+Add extra final useful points.
 """}
         ]
         return self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=80)

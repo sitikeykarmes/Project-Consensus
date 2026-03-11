@@ -17,18 +17,9 @@ class Orchestrator:
     def execute_query(self, user_query: str, conversation_history: list = None, mode_override: str = None) -> dict:
         """Main orchestration logic with conversation context"""
         
-        # Build context string from history
-        context_str = ""
-        if conversation_history:
-            context_parts = []
-            for msg in conversation_history[-10:]:  # Last 10 messages
-                role = msg.get("role", "user")
-                content = msg.get("content", "")
-                name = msg.get("name", role)
-                context_parts.append(f"{name}: {content}")
-            context_str = "\n".join(context_parts)
+        context_str = self._build_context_str(conversation_history)
         
-        # Step 1: Classify intent (with context)
+        # Step 1: Classify intent
         if mode_override:
             mode = mode_override
         else:
@@ -36,7 +27,7 @@ class Orchestrator:
             mode = self.intent_classifier.classify(user_query, context_str)
             print(f"Mode selected: {mode}")
         
-        # Step 2: Execute appropriate mode (with context)
+        # Step 2: Execute appropriate mode
         if mode == "opposition":
             result = self.opposition_mode.run(user_query, context_str)
         elif mode == "support":
@@ -44,7 +35,7 @@ class Orchestrator:
         else:
             result = self.independent_mode.run(user_query, context_str)
         
-        # Step 3: Consensus synthesis (with context)
+        # Step 3: Consensus synthesis
         print("Synthesizing consensus...")
         final_answer = self.synthesize_consensus(user_query, result, context_str)
         print("Complete!")
@@ -54,6 +45,28 @@ class Orchestrator:
             "agent_responses": result["responses"],
             "final_answer": final_answer
         }
+
+    def _build_context_str(self, conversation_history: list) -> str:
+        """
+        Converts conversation_history into a formatted string for agent prompts.
+
+        Handles two types of entries passed by context_builder:
+          - Summary entry:  {"name": "Context Summary", "content": "[Summary of earlier...]"}
+          - Regular entry:  {"name": "user@email.com",  "content": "..."}
+
+        Does NOT slice — the hybrid context builder already controls the window.
+        Summary is always first, followed by recent verbatim messages.
+        """
+        if not conversation_history:
+            return ""
+
+        parts = []
+        for msg in conversation_history:
+            name    = msg.get("name", msg.get("role", "unknown"))
+            content = msg.get("content", "")
+            parts.append(f"{name}: {content}")
+
+        return "\n".join(parts)
     
     def synthesize_consensus(self, original_query: str, agent_results: dict, context_str: str = "") -> str:
         """Synthesize final consensus from agent responses using agent4 (qwen/qwen3-32b)"""
@@ -81,9 +94,10 @@ Guidelines:
 - If code → provide full working code.
 - If essay → provide full essay.
 - If explanation → give detailed explanation.
+- If said "okay" or "thanks" → no need to repeat or summarize in detail, just acknowledge naturally in short.
 
 Task:
-- Summarize the key takeaway from the agent discussion.
+- Summarize the key takeaway from the agent discussion when you think is needed otherwise just give Final Answer, but dont mention the words Final Answer.
 - Mention if any correction/debate happened, Mention only if happened, otherwise no need to mention about debate/correction.
 - Consider the previous conversation context if available or if relevant.
 - Give a concise, clear, and coherent final answer that addresses the user's query based on the agent responses and context.
@@ -100,7 +114,6 @@ Be concise. Synthesize a final consensus answer:"""
                 {"role": "user", "content": synthesis_prompt}
             ]
 
-            # agent4 = qwen/qwen3-32b (streaming internally, returns full string)
             return self.consensus_client.get_completion("agent4", messages, max_tokens=4096)
             
         except Exception as e:
