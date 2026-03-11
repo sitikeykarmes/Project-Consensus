@@ -6,6 +6,7 @@ from app.db.init_db import init_database
 from app.db.database import SessionLocal
 
 from app.db.message_service import save_message, load_recent_messages
+from app.utils.context_builder import build_hybrid_context
 
 from app.auth.auth_routes import router as auth_router
 from app.groups.group_routes import router as group_router
@@ -56,8 +57,8 @@ app.add_middleware(
 groups_db: Dict[str, dict] = {}
 
 AVAILABLE_AGENTS = [
-    {"id": "agent_research", "name": "Agent 1", "type": "agent", "avatar": "A1"},
-    {"id": "agent_analysis", "name": "Agent 2", "type": "agent", "avatar": "A2"},
+    {"id": "agent_research",  "name": "Agent 1", "type": "agent", "avatar": "A1"},
+    {"id": "agent_analysis",  "name": "Agent 2", "type": "agent", "avatar": "A2"},
     {"id": "agent_synthesis", "name": "Agent 3", "type": "agent", "avatar": "A3"},
 ]
 
@@ -117,18 +118,22 @@ except Exception as e:
 def initialize_default_groups():
     if not groups_db:
         groups_db["group_general"] = {
-            "id": "group_general",
-            "name": "General Chat",
-            "avatar": "GC",
-            "members": [],
-            "agents": ["agent_research", "agent_analysis", "agent_synthesis"],
-            "created_at": datetime.now().isoformat(),
-            "last_message": "Welcome!",
+            "id":                "group_general",
+            "name":              "General Chat",
+            "avatar":            "GC",
+            "members":           [],
+            "agents":            ["agent_research", "agent_analysis", "agent_synthesis"],
+            "created_at":        datetime.now().isoformat(),
+            "last_message":      "Welcome!",
             "last_message_time": datetime.now().isoformat(),
         }
 
 initialize_default_groups()
 
+
+# ─────────────────────────────────────────────
+# Routes
+# ─────────────────────────────────────────────
 
 @app.get("/")
 def read_root():
@@ -167,38 +172,9 @@ def resolve_agent_id(agent_name: str) -> str | None:
     return None
 
 
-def build_conversation_history(room_id: str, limit: int = 10) -> list:
-    """Load recent messages from DB and format as conversation history for AI context."""
-    from app.db.models import Message as MessageModel
-    db = SessionLocal()
-    try:
-        messages = (
-            db.query(MessageModel)
-            .filter(MessageModel.group_id == room_id)
-            .order_by(MessageModel.timestamp.desc())
-            .limit(limit)
-            .all()
-        )
-        messages.reverse()  # oldest first
-        
-        history = []
-        for msg in messages:
-            if msg.sender_type == "user":
-                history.append({
-                    "role": "user",
-                    "name": msg.sender_name,
-                    "content": msg.content
-                })
-            elif msg.sender_type == "consensus":
-                history.append({
-                    "role": "assistant",
-                    "name": "AI Consensus",
-                    "content": msg.content
-                })
-        return history
-    finally:
-        db.close()
-
+# ─────────────────────────────────────────────
+# WebSocket
+# ─────────────────────────────────────────────
 
 @app.websocket("/api/ws/{room_id}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str):
@@ -215,48 +191,46 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
     user_email = user.email
     await manager.connect(websocket, room_id, user_email)
 
-    # Load previous messages when user joins
-    # Load previous messages when user joins
+    # ── Load previous messages on join ──
     db = SessionLocal()
     try:
         recent_messages = load_recent_messages(db, room_id, limit=50)
         for msg in recent_messages:
             msg_data = {
-                "type": msg.sender_type,
-                "sender_id": msg.sender_id,
+                "type":        msg.sender_type,
+                "sender_id":   msg.sender_id,
                 "sender_name": msg.sender_name,
-                "content": msg.content,
-                "timestamp": msg.timestamp.isoformat(),
+                "content":     msg.content,
+                "timestamp":   msg.timestamp.isoformat(),
             }
             if msg.sender_type == "consensus" and msg.extra_data:
                 try:
                     meta = json.loads(msg.extra_data)
-                    msg_data["mode_used"] = meta.get("mode_used", "")
+                    msg_data["mode_used"]       = meta.get("mode_used", "")
                     msg_data["agent_responses"] = meta.get("agent_responses", [])
                 except:
                     pass
             try:
                 await websocket.send_json(msg_data)
             except Exception:
-                # Client disconnected before history finished sending — exit cleanly
                 return
     finally:
         db.close()
 
-    # Broadcast join
+    # ── Broadcast join ──
     await manager.broadcast_to_room(
         {
-            "type": "user_joined",
-            "user_name": user_email,
+            "type":         "user_joined",
+            "user_name":    user_email,
             "online_users": manager.get_room_users(room_id),
-            "timestamp": datetime.now().isoformat(),
+            "timestamp":    datetime.now().isoformat(),
         },
         room_id,
     )
 
     try:
         while True:
-            data = await websocket.receive_text()
+            data         = await websocket.receive_text()
             message_data = json.loads(data)
 
             user_message = message_data.get("message", "").strip()
@@ -280,20 +254,19 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             # Broadcast user message
             await manager.broadcast_to_room(
                 {
-                    "type": "user",
-                    "sender_id": user.id,
+                    "type":        "user",
+                    "sender_id":   user.id,
                     "sender_name": user_email,
-                    "content": user_message,
-                    "timestamp": datetime.now().isoformat(),
+                    "content":     user_message,
+                    "timestamp":   datetime.now().isoformat(),
                 },
                 room_id,
             )
 
-            # AI Processing
             if not orchestrator:
                 continue
 
-            # Fetch group from DB
+            # Fetch group
             db = SessionLocal()
             try:
                 from app.db.models import Group as GroupModel
@@ -308,32 +281,37 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             if not agents:
                 continue
 
-            # Send typing indicator
+            # Typing indicator
             await manager.broadcast_to_room(
                 {
-                    "type": "typing",
+                    "type":        "typing",
                     "sender_name": "AI Agents",
-                    "timestamp": datetime.now().isoformat(),
+                    "timestamp":   datetime.now().isoformat(),
                 },
                 room_id,
             )
 
-            # Build conversation history for context
-            conversation_history = build_conversation_history(room_id, limit=10)
+            # ── Build hybrid context (summary + recent 15 verbatim) ──
+            db = SessionLocal()
+            try:
+                hybrid_ctx = build_hybrid_context(db, room_id)
+            finally:
+                db.close()
 
-            # Execute orchestrator with context
-            result = orchestrator.execute_query(user_message, conversation_history)
+            conversation_history = hybrid_ctx["conversation_history"]
+
+            # Execute orchestrator with hybrid context
+            result = orchestrator.execute_query(
+                user_message,
+                conversation_history=conversation_history,
+            )
 
             agent_responses = result["agent_responses"]
-            final_answer = result["final_answer"]
-            mode_used = result["mode_used"]
+            final_answer    = result["final_answer"]
+            mode_used       = result["mode_used"]
 
-            # Save consensus with metadata (agent responses bundled)
-            metadata = json.dumps({
-                "mode_used": mode_used,
-                "agent_responses": agent_responses
-            })
-
+            # Save consensus
+            metadata = json.dumps({"mode_used": mode_used, "agent_responses": agent_responses})
             db = SessionLocal()
             try:
                 save_message(
@@ -348,15 +326,15 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             finally:
                 db.close()
 
-            # Send bundled consensus message (with agent responses inside)
+            # Broadcast consensus
             await manager.broadcast_to_room(
                 {
-                    "type": "consensus",
-                    "sender_name": "AI Consensus",
-                    "content": final_answer.strip(),
-                    "mode_used": mode_used,
+                    "type":            "consensus",
+                    "sender_name":     "AI Consensus",
+                    "content":         final_answer.strip(),
+                    "mode_used":       mode_used,
                     "agent_responses": agent_responses,
-                    "timestamp": datetime.now().isoformat(),
+                    "timestamp":       datetime.now().isoformat(),
                 },
                 room_id,
             )
@@ -365,8 +343,8 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
         manager.disconnect(websocket, room_id)
         await manager.broadcast_to_room(
             {
-                "type": "user_left",
-                "user_name": user_email,
+                "type":         "user_left",
+                "user_name":    user_email,
                 "online_users": manager.get_room_users(room_id),
             },
             room_id,

@@ -56,7 +56,7 @@ class Orchestrator:
         }
     
     def synthesize_consensus(self, original_query: str, agent_results: dict, context_str: str = "") -> str:
-        """Synthesize final consensus from agent responses"""
+        """Synthesize final consensus from agent responses using agent4 (qwen/qwen3-32b)"""
         responses_text = "\n\n".join([
             f"{r['agent_name']}: {r['content']}" 
             for r in agent_results["responses"]
@@ -75,16 +75,22 @@ Agent Responses:
 {responses_text}
 
 You are the final assistant in a Multi-User Multi-AI group chat.
+Guidelines:
+- Do NOT always summarize.
+- If greeting → respond naturally.
+- If code → provide full working code.
+- If essay → provide full essay.
+- If explanation → give detailed explanation.
 
 Task:
 - Summarize the key takeaway from the agent discussion.
 - Mention if any correction/debate happened, Mention only if happened, otherwise no need to mention about debate/correction.
-- Consider the previous conversation context if available.
+- Consider the previous conversation context if available or if relevant.
 - Give a concise, clear, and coherent final answer that addresses the user's query based on the agent responses and context.
 
 Rules:
-- Give Headings and formatting.
-- Sound like ChatGPT/Gemini.
+- Give Headings and formatting only when useful.
+- Sound Natural and Intelligent and like Top-Tier AI assistants - ChatGPT/Gemini.
 
 Be concise. Synthesize a final consensus answer:"""
 
@@ -93,8 +99,9 @@ Be concise. Synthesize a final consensus answer:"""
                 {"role": "system", "content": "You are a synthesis expert. Combine multiple perspectives into one coherent answer."},
                 {"role": "user", "content": synthesis_prompt}
             ]
-            
-            return self.consensus_client.get_completion("agent3", messages, temperature=0.3, max_tokens=600)
+
+            # agent4 = qwen/qwen3-32b (streaming internally, returns full string)
+            return self.consensus_client.get_completion("agent4", messages, max_tokens=4096)
             
         except Exception as e:
             return f"Error in synthesis: {e}"

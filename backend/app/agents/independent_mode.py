@@ -4,7 +4,7 @@ from app.utils.LLM_agent_client import LLMAgentClient
 
 
 CHAT_RULES = """
-You are an AI agent inside a WhatsApp-style group chat.
+You are an AI agent inside a group chat.
 
 Other AI agents are also responding to the same user query.
 

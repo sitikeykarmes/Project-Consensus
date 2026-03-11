@@ -9,8 +9,8 @@ You are inside a WhatsApp group chat with other AI agents.
 Rules:
 - Replies must be SHORT.
 - No essays, no markdown tables.
-- Write essays, give long tables, bullet lists, etc. only when the user explicitly asks for it.
-- Only key point per message.
+- Write essays, detailed explanation, full working code, give long tables, bullet lists, etc. only when the user explicitly asks for it.
+- Only key point.
 - Speak naturally like ChatGPT/Gemini in a group.
 - If conversation context is provided, use it to give more relevant answers.
 """
@@ -28,7 +28,7 @@ class OppositionMode:
             {
                 "role": "system",
                 "content": CHAT_RULES
-                + "\nRole: Agent 1 (Generator). Give an initial short answer."
+                + "\nRole: Agent 1 (Generator). Give an initial short but valuable answer with most important details."
             },
             {"role": "user", "content": f"{context_block}\n{user_query}"},
         ]

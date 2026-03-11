@@ -36,10 +36,18 @@ class LLMAgentClient:
                 "provider": "groq",
                 "model": "moonshotai/kimi-k2-instruct-0905",
             },
+            "agent4": {
+                "provider": "groq",
+                "model": "qwen/qwen3-32b",
+                "streaming": True,          # agent4 uses streaming
+                "temperature": 0.6,
+                "top_p": 0.95,
+                "reasoning_effort": "default",
+            },
         }
 
     # -------------------------------------------------
-    # Main Completion Function (Cleaner Retry Loop)
+    # Main Completion Function (Non-Streaming Agents)
     # -------------------------------------------------
     def get_completion(
         self,
@@ -50,9 +58,10 @@ class LLMAgentClient:
     ) -> str:
         """
         Calls Groq chat completion safely.
+        Routes agent4 to the streaming handler automatically.
 
         Features:
-        - Retries up to 3 times
+        - Retries up to 4 times
         - Fixes blank model replies
         - Token boost on retries
         - Clean + scalable retry logic
@@ -63,6 +72,12 @@ class LLMAgentClient:
         # -----------------------------
         if model_key not in self.models:
             return f"Error: Unknown model key '{model_key}'"
+
+        # -----------------------------
+        # Route agent4 to streaming handler
+        # -----------------------------
+        if self.models[model_key].get("streaming"):
+            return self.get_streaming_completion(model_key, messages, max_tokens)
 
         model_name = self.models[model_key]["model"]
 
@@ -85,7 +100,7 @@ class LLMAgentClient:
             # -----------------------------------------
             # Retry Attempts (4 total)
             # -----------------------------------------
-            token_boosts = [400,500,600,700]
+            token_boosts = [400, 500, 600, 700]
 
             for attempt, boost in enumerate(token_boosts, start=1):
 
@@ -107,6 +122,60 @@ class LLMAgentClient:
             # -----------------------------------------
             print(f"❌ {model_key} failed after 4 attempts (blank output).")
             return "⚠️ Agent did not respond properly after 4 attempts. Please try again."
+
+        except Exception as e:
+            error_msg = f"Error with {model_key} ({model_name}): {str(e)}"
+            print(f"❌ {error_msg}")
+            return f"Error: {error_msg}"
+
+    # -------------------------------------------------
+    # Streaming Completion Function (agent4 / Qwen)
+    # -------------------------------------------------
+    def get_streaming_completion(
+        self,
+        model_key: str,
+        messages: List[Dict],
+        max_tokens: int = 4096,
+    ) -> str:
+        """
+        Handles streaming completions for agent4 (qwen/qwen3-32b).
+        Collects all streamed chunks and returns the full response as a string.
+        """
+
+        model_config = self.models[model_key]
+        model_name = model_config["model"]
+
+        try:
+            print(f"🔄 Requesting {model_key} ({model_name}) via Groq [streaming]...")
+
+            completion = self.groq_client.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                temperature=model_config.get("temperature", 0.6),
+                max_completion_tokens=max_tokens,
+                top_p=model_config.get("top_p", 0.95),
+                reasoning_effort=model_config.get("reasoning_effort", "default"),
+                stream=True,
+                stop=None,
+            )
+
+            # Collect all streamed chunks into a single string
+            full_response = ""
+            for chunk in completion:
+                delta = chunk.choices[0].delta.content
+                if delta:
+                    full_response += delta
+
+            # Strip Qwen's internal <think>...</think> reasoning block
+            import re
+            full_response = re.sub(r"<think>.*?</think>", "", full_response, flags=re.DOTALL).strip()
+
+            if full_response:
+                print(f"✅ {model_key} streaming completed successfully.")
+                return full_response
+
+            print(f"❌ {model_key} returned blank streaming output.")
+            return "⚠️ Agent did not respond properly. Please try again."
 
         except Exception as e:
             error_msg = f"Error with {model_key} ({model_name}): {str(e)}"
