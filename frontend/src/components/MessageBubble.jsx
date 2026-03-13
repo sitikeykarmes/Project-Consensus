@@ -1,3 +1,4 @@
+// src/components/MessageBubble.jsx
 import { useState } from "react";
 import {
   ChevronDown,
@@ -7,6 +8,7 @@ import {
   User,
   Sparkles,
 } from "lucide-react";
+import MessageRenderer from "./MessageRenderer";
 
 function getModeLabel(mode) {
   const labels = {
@@ -29,14 +31,14 @@ function getModeColor(mode) {
 function ConsensusMessage({ msg }) {
   const [expanded, setExpanded] = useState(false);
 
-  const modeUsed = msg.mode_used || "";
+  const modeUsed       = msg.mode_used || "";
   const agentResponses = msg.agent_responses || [];
-  const modeColor = getModeColor(modeUsed);
+  const modeColor      = getModeColor(modeUsed);
 
   return (
     <div data-testid="consensus-message" className="flex msg-enter">
       <div
-        className="w-full max-w-[65%] rounded-xl overflow-hidden consensus-glow"
+        className="w-full max-w-[75%] rounded-xl overflow-hidden consensus-glow"
         style={{
           background: "#1f2c34",
           border: "1px solid rgba(255,215,0,0.25)",
@@ -48,7 +50,7 @@ function ConsensusMessage({ msg }) {
             data-testid="consensus-mode-tag"
             className="flex items-center gap-2 px-4 py-2"
             style={{
-              background: "rgba(255,215,0,0.06)",
+              background:   "rgba(255,215,0,0.06)",
               borderBottom: "1px solid rgba(255,215,0,0.15)",
             }}
           >
@@ -63,8 +65,8 @@ function ConsensusMessage({ msg }) {
               className="text-[10px] px-2 py-0.5 rounded-full font-medium"
               style={{
                 background: `${modeColor}22`,
-                color: modeColor,
-                border: `1px solid ${modeColor}44`,
+                color:      modeColor,
+                border:     `1px solid ${modeColor}44`,
               }}
             >
               {getModeLabel(modeUsed)}
@@ -72,21 +74,16 @@ function ConsensusMessage({ msg }) {
           </div>
         )}
 
-        {/* Consensus Body */}
+        {/* ── Consensus Body: full markdown rendering ── */}
         <div className="px-4 py-3">
-          <p
-            className="text-sm leading-relaxed whitespace-pre-line"
-            style={{ color: "#e9edef" }}
-          >
-            {msg.content}
-          </p>
+          <MessageRenderer content={msg.content} />
           {msg.timestamp && (
             <p
               className="text-[10px] mt-2 text-right"
               style={{ color: "#8696a0" }}
             >
               {new Date(msg.timestamp).toLocaleTimeString([], {
-                hour: "2-digit",
+                hour:   "2-digit",
                 minute: "2-digit",
               })}
             </p>
@@ -101,9 +98,9 @@ function ConsensusMessage({ msg }) {
               onClick={() => setExpanded(!expanded)}
               className="w-full py-2.5 flex items-center justify-center gap-2 transition-all cursor-pointer"
               style={{
-                background: "rgba(17,27,33,0.6)",
-                color: "#8696a0",
-                borderTop: "1px solid rgba(42,57,66,0.5)",
+                background:  "rgba(17,27,33,0.6)",
+                color:       "#8696a0",
+                borderTop:   "1px solid rgba(42,57,66,0.5)",
               }}
             >
               <Bot size={14} />
@@ -121,7 +118,7 @@ function ConsensusMessage({ msg }) {
                 className="px-4 py-3 space-y-3"
                 style={{
                   background: "rgba(11,20,26,0.5)",
-                  borderTop: "1px solid rgba(42,57,66,0.3)",
+                  borderTop:  "1px solid rgba(42,57,66,0.3)",
                 }}
               >
                 {agentResponses.map((resp, idx) => (
@@ -131,7 +128,7 @@ function ConsensusMessage({ msg }) {
                     className="rounded-lg p-3"
                     style={{
                       background: "#202c33",
-                      border: "1px solid #2a3942",
+                      border:     "1px solid #2a3942",
                     }}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
@@ -148,12 +145,8 @@ function ConsensusMessage({ msg }) {
                         {resp.agent_name || `Agent ${idx + 1}`}
                       </span>
                     </div>
-                    <p
-                      className="text-xs leading-relaxed whitespace-pre-line"
-                      style={{ color: "#8696a0" }}
-                    >
-                      {resp.content}
-                    </p>
+                    {/* ── Agent responses also get markdown rendering ── */}
+                    <MessageRenderer content={resp.content} dimText={true} />
                   </div>
                 ))}
               </div>
@@ -176,10 +169,10 @@ function UserMessage({ msg, isCurrentUser }) {
         data-testid={isCurrentUser ? "user-own-message" : "user-other-message"}
         className="max-w-[65%] px-4 py-2 rounded-xl shadow-sm"
         style={{
-          background: isCurrentUser ? "#005c4b" : "#202c33",
+          background:           isCurrentUser ? "#005c4b" : "#202c33",
           borderTopRightRadius: isCurrentUser ? 0 : undefined,
-          borderTopLeftRadius: isCurrentUser ? undefined : 0,
-          border: isCurrentUser ? "none" : "1px solid #2a3942",
+          borderTopLeftRadius:  isCurrentUser ? undefined : 0,
+          border:               isCurrentUser ? "none" : "1px solid #2a3942",
         }}
       >
         {!isCurrentUser && (
@@ -190,6 +183,7 @@ function UserMessage({ msg, isCurrentUser }) {
             {senderLabel}
           </p>
         )}
+        {/* User messages stay as plain text — no markdown needed */}
         <p
           className="text-sm leading-relaxed whitespace-pre-line"
           style={{ color: "#e9edef" }}
@@ -204,7 +198,7 @@ function UserMessage({ msg, isCurrentUser }) {
             }}
           >
             {new Date(msg.timestamp).toLocaleTimeString([], {
-              hour: "2-digit",
+              hour:   "2-digit",
               minute: "2-digit",
             })}
           </p>
@@ -240,7 +234,6 @@ export default function MessageBubble({ msg, currentUserId }) {
   }
 
   if (msg.type === "system" || msg.type === "agent") {
-    // Legacy: handle old-style messages
     if (msg.sender_name === "Consensus" || msg.sender_name === "AI Consensus") {
       return <ConsensusMessage msg={msg} />;
     }

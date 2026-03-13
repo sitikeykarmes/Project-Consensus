@@ -4,6 +4,7 @@ from app.agents.support_mode import SupportMode
 from app.agents.independent_mode import IndependentMode
 from app.utils.intent_classifier import IntentClassifier
 from app.utils.LLM_agent_client import LLMAgentClient
+from app.utils.Evaluator import evaluate_synthesis
 import os
 
 class Orchestrator:
@@ -37,9 +38,18 @@ class Orchestrator:
         
         # Step 3: Consensus synthesis
         print("Synthesizing consensus...")
-        final_answer = self.synthesize_consensus(user_query, result, context_str)
+        final_answer = self.synthesize_consensus(user_query, result, context_str, mode)
         print("Complete!")
         
+        # Step 4: Evaluate synthesis quality — prints scorecard to terminal  ← NEW
+        evaluate_synthesis(
+            user_query      = user_query,
+            agent_responses = result["responses"],
+            final_answer    = final_answer,
+            mode            = mode,
+            context_str     = context_str,
+        )
+
         return {
             "mode_used": mode,
             "agent_responses": result["responses"],
@@ -49,13 +59,8 @@ class Orchestrator:
     def _build_context_str(self, conversation_history: list) -> str:
         """
         Converts conversation_history into a formatted string for agent prompts.
-
-        Handles two types of entries passed by context_builder:
-          - Summary entry:  {"name": "Context Summary", "content": "[Summary of earlier...]"}
-          - Regular entry:  {"name": "user@email.com",  "content": "..."}
-
-        Does NOT slice — the hybrid context builder already controls the window.
-        Summary is always first, followed by recent verbatim messages.
+        Does NOT slice — context_builder already controls the window.
+        Summary entry (from hybrid memory) is always kept at the top.
         """
         if not conversation_history:
             return ""
@@ -68,7 +73,7 @@ class Orchestrator:
 
         return "\n".join(parts)
     
-    def synthesize_consensus(self, original_query: str, agent_results: dict, context_str: str = "") -> str:
+    def synthesize_consensus(self, original_query: str, agent_results: dict, context_str: str = "", mode: str = "") -> str:
         """Synthesize final consensus from agent responses using agent4 (qwen/qwen3-32b)"""
         responses_text = "\n\n".join([
             f"{r['agent_name']}: {r['content']}" 
@@ -77,43 +82,67 @@ class Orchestrator:
         
         context_section = ""
         if context_str:
-            context_section = f"""Previous Conversation Context:
+            context_section = f"""[Conversation Context — use ONLY if directly relevant to this specific query]:
 {context_str}
 
 """
-        
+
+        mode_hint = {
+            "opposition": "Agents debated this. Resolve the debate, correct errors, give the verified answer.",
+            "support":    "Agents explained this sequentially. Combine into one complete, well-structured answer.",
+            "independent":"Agents gave independent perspectives. Synthesize into one coherent answer without repetition.",
+        }.get(mode, "")
+
         synthesis_prompt = f"""{context_section}User Query: {original_query}
 
 Agent Responses:
 {responses_text}
 
-You are the final assistant in a Multi-User Multi-AI group chat.
-Guidelines:
-- Do NOT always summarize.
-- If greeting → respond naturally.
-- If code → provide full working code.
-- If essay → provide full essay.
-- If explanation → give detailed explanation.
-- If said "okay" or "thanks" → no need to repeat or summarize in detail, just acknowledge naturally in short.
+{f"Mode hint: {mode_hint}" if mode_hint else ""}
 
-Task:
-- Summarize the key takeaway from the agent discussion when you think is needed otherwise just give Final Answer, but dont mention the words Final Answer.
-- Mention if any correction/debate happened, Mention only if happened, otherwise no need to mention about debate/correction.
-- Consider the previous conversation context if available or if relevant.
-- Give a concise, clear, and coherent final answer that addresses the user's query based on the agent responses and context.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You are the FINAL AI in a multi-agent group chat. You are the smartest agent.
+Your job is to give the BEST possible final answer.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Rules:
-- Give Headings and formatting only when useful.
-- Sound Natural and Intelligent and like Top-Tier AI assistants - ChatGPT/Gemini.
+STRICT INTELLIGENCE RULES:
+1. MATCH YOUR RESPONSE LENGTH TO THE QUESTION.
+   - Simple question → short, direct answer.
+   - Deep technical question → full detailed answer with code/examples.
+   - Essay request → full essay.
+   - "Okay" / "thanks" / greeting → this should NOT reach you. If it does, respond in 1 line.
 
-Be concise. Synthesize a final consensus answer:"""
+2. NEVER SUMMARIZE THE AGENT DISCUSSION unless there was a real debate/correction worth noting.
+   - If agents agreed → just give the answer, don't mention they agreed.
+   - If agents debated and corrected each other → briefly mention the correction, then give the right answer.
+   - NEVER start with "The agents discussed..." or "Agent 1 said..." — users don't care.
+
+3. CONTEXT USAGE — BE SMART:
+   - Use conversation context ONLY if it genuinely helps answer this specific query.
+   - If the user asks something completely new, IGNORE previous context entirely.
+   - NEVER recap or summarize previous exchanges just because context exists.
+   - Do NOT mention "based on our previous conversation" unless it's truly necessary.
+
+4. FORMATTING:
+   - Use headers/sections ONLY for long multi-part answers.
+   - Use code blocks for ALL code — never inline plain text code.
+   - Use bullet points only when listing genuinely distinct items.
+   - No unnecessary padding, preamble, or filler phrases.
+
+5. TONE: Sound like ChatGPT or Claude — confident, natural, intelligent. Not corporate, not robotic.
+
+Now give the final answer:"""
 
         try:
             messages = [
-                {"role": "system", "content": "You are a synthesis expert. Combine multiple perspectives into one coherent answer."},
+                {
+                    "role": "system",
+                    "content": "You are the smartest AI in a multi-agent system. You synthesize agent discussions into the single best possible final answer, adapting your length, tone, and format to exactly match what the question needs."
+                },
                 {"role": "user", "content": synthesis_prompt}
             ]
 
+            # agent4 = qwen/qwen3-32b (streaming internally, returns full string)
             return self.consensus_client.get_completion("agent4", messages, max_tokens=4096)
             
         except Exception as e:
