@@ -54,13 +54,30 @@ export default function ChatWindow({ group, user }) {
         return;
       }
 
-      // When we get a consensus, stop typing
       if (msg.type === "consensus") {
         setIsAiTyping(false);
       }
 
-      // Skip old-style system/agent messages that we no longer need individually
       if (msg.type === "user_joined" || msg.type === "user_left") {
+        return;
+      }
+
+      if (msg.type === "user") {
+        // Replace the optimistic message with the confirmed server message
+        // Match by content to find the optimistic one
+        setMessages((prev) => {
+          const optimisticIndex = prev.findLastIndex(
+            (m) => m._optimistic && m.content === msg.content,
+          );
+          if (optimisticIndex !== -1) {
+            // Replace optimistic with real server message
+            const updated = [...prev];
+            updated[optimisticIndex] = msg;
+            return updated;
+          }
+          // Not found (message from another user) — just append
+          return [...prev, msg];
+        });
         return;
       }
 
@@ -84,6 +101,26 @@ export default function ChatWindow({ group, user }) {
   function sendMessage(text) {
     if (!socketRef.current) return;
     if (socketRef.current.readyState !== WebSocket.OPEN) return;
+
+    // ── Optimistic update: show message immediately in UI ──
+    const userStr = localStorage.getItem("user");
+    const userData = userStr ? JSON.parse(userStr) : {};
+
+    const optimisticMsg = {
+      type: "user",
+      sender_id: userData.id || currentUserId,
+      sender_name: userData.email || "You",
+      content: text,
+      timestamp: new Date().toISOString(),
+      _optimistic: true, // flag so we can replace it with the server echo
+    };
+
+    setMessages((prev) => [...prev, optimisticMsg]);
+
+    // ── Show typing indicator immediately ──
+    setIsAiTyping(true);
+
+    // Send to server
     socketRef.current.send(JSON.stringify({ message: text }));
   }
 
