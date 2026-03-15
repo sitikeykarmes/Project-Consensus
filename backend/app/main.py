@@ -2,7 +2,6 @@
 import asyncio
 import httpx
 from contextlib import asynccontextmanager
-from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt, JWTError
@@ -39,7 +38,29 @@ from pathlib import Path
 env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
+
+async def keep_alive():
+    await asyncio.sleep(60)  # wait 1 min after startup
+    while True:
+        try:
+            url = os.getenv("RENDER_EXTERNAL_URL", "")
+            if url:
+                async with httpx.AsyncClient() as client:
+                    await client.get(f"{url}/")
+                    print("🏓 Keep-alive ping sent.")
+        except Exception as e:
+            print(f"⚠️ Keep-alive failed: {e}")
+        await asyncio.sleep(600)  # ping every 10 minutes
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    asyncio.create_task(keep_alive())
+    yield
+    
+    
 app = FastAPI(title="Consensus")
+
+
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecretkey")
 ALGORITHM = "HS256"
 init_database()
