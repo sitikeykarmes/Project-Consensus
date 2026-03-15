@@ -1,3 +1,4 @@
+#backend/app/auth/ws_auth.py
 from jose import jwt, JWTError
 from fastapi import HTTPException
 import os
