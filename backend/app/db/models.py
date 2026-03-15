@@ -37,7 +37,7 @@ class Group(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     agents = Column(Text, default="[]")
-    created_by = Column(Integer)
+    created_by = Column(String, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime)
 
     members = relationship(

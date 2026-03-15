@@ -12,7 +12,7 @@ Combines two independent evaluation layers:
     • Agent Coverage: token overlap per agent
 
   Layer 2 — LLM Judge (semantic, catches meaning-level issues stats miss)
-    • Scores same 5 dimensions 1–5
+    • Scores same 5 dimensions 1-5
     • Uses llama-3.3-70b — fast, separate from synthesis model (no self-grading)
     • Given the deterministic scores as anchors to reduce its own hallucination
 

@@ -2,13 +2,24 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+import os
 
-DATABASE_URL = "sqlite:///./whatsapp_aidb.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./whatsapp_aidb.db")
 
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False}  # needed for SQLite
-)
+# PostgreSQL needs pool settings; SQLite needs check_same_thread
+if DATABASE_URL.startswith("postgresql"):
+    engine = create_engine(
+        DATABASE_URL,
+        pool_size=10,
+        max_overflow=20,
+        pool_pre_ping=True,     # auto-reconnect if connection dropped
+    )
+else:
+    # SQLite fallback (local dev without .env)
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -19,7 +30,6 @@ SessionLocal = sessionmaker(
 Base = declarative_base()
 
 
-# ✅ Central DB Dependency (used everywhere)
 def get_db():
     db = SessionLocal()
     try:
