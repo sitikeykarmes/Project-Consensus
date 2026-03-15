@@ -1,4 +1,8 @@
 # backend/app/main.py
+import asyncio
+import httpx
+from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt, JWTError
