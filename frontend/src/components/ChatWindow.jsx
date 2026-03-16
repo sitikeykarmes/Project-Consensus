@@ -5,7 +5,7 @@ import TypingIndicator from "./TypingIndicator";
 import ChatInput from "./ChatInput";
 import { getWsUrl } from "../api/chatApi";
 
-export default function ChatWindow({ group, user }) {
+export default function ChatWindow({ group, user, onGroupDeleted }) {
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -42,9 +42,7 @@ export default function ChatWindow({ group, user }) {
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 
-    socket.onopen = () => {
-      setConnected(true);
-    };
+    socket.onopen = () => setConnected(true);
 
     socket.onmessage = (event) => {
       const msg = JSON.parse(event.data);
@@ -54,28 +52,20 @@ export default function ChatWindow({ group, user }) {
         return;
       }
 
-      if (msg.type === "consensus") {
-        setIsAiTyping(false);
-      }
+      if (msg.type === "consensus") setIsAiTyping(false);
 
-      if (msg.type === "user_joined" || msg.type === "user_left") {
-        return;
-      }
+      if (msg.type === "user_joined" || msg.type === "user_left") return;
 
       if (msg.type === "user") {
-        // Replace the optimistic message with the confirmed server message
-        // Match by content to find the optimistic one
         setMessages((prev) => {
           const optimisticIndex = prev.findLastIndex(
             (m) => m._optimistic && m.content === msg.content,
           );
           if (optimisticIndex !== -1) {
-            // Replace optimistic with real server message
             const updated = [...prev];
             updated[optimisticIndex] = msg;
             return updated;
           }
-          // Not found (message from another user) — just append
           return [...prev, msg];
         });
         return;
@@ -89,20 +79,15 @@ export default function ChatWindow({ group, user }) {
       setIsAiTyping(false);
     };
 
-    socket.onerror = () => {
-      setConnected(false);
-    };
+    socket.onerror = () => setConnected(false);
 
-    return () => {
-      socket.close();
-    };
+    return () => socket.close();
   }, [group?.id]);
 
   function sendMessage(text) {
     if (!socketRef.current) return;
     if (socketRef.current.readyState !== WebSocket.OPEN) return;
 
-    // ── Optimistic update: show message immediately in UI ──
     const userStr = localStorage.getItem("user");
     const userData = userStr ? JSON.parse(userStr) : {};
 
@@ -112,16 +97,17 @@ export default function ChatWindow({ group, user }) {
       sender_name: userData.email || "You",
       content: text,
       timestamp: new Date().toISOString(),
-      _optimistic: true, // flag so we can replace it with the server echo
+      _optimistic: true,
     };
 
     setMessages((prev) => [...prev, optimisticMsg]);
-
-    // ── Show typing indicator immediately ──
     setIsAiTyping(true);
-
-    // Send to server
     socketRef.current.send(JSON.stringify({ message: text }));
+  }
+
+  function handleGroupDeleted() {
+    socketRef.current?.close();
+    onGroupDeleted?.(group.id);
   }
 
   return (
@@ -130,7 +116,6 @@ export default function ChatWindow({ group, user }) {
       className="flex-1 flex flex-col relative"
       style={{ background: "#0b141a" }}
     >
-      {/* WhatsApp background pattern */}
       <div
         className="absolute inset-0 opacity-[0.08] pointer-events-none"
         style={{
@@ -140,9 +125,12 @@ export default function ChatWindow({ group, user }) {
         }}
       />
 
-      <ChatHeader group={group} connected={connected} />
+      <ChatHeader
+        group={group}
+        connected={connected}
+        onGroupDeleted={handleGroupDeleted}
+      />
 
-      {/* Messages */}
       <div
         data-testid="messages-container"
         className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 space-y-2 relative z-10"
@@ -150,9 +138,7 @@ export default function ChatWindow({ group, user }) {
         {messages.map((msg, i) => (
           <MessageBubble key={i} msg={msg} currentUserId={currentUserId} />
         ))}
-
         {isAiTyping && <TypingIndicator />}
-
         <div ref={messagesEndRef} />
       </div>
 

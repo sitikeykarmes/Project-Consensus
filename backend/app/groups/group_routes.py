@@ -6,12 +6,11 @@ import uuid
 from datetime import datetime
 import json
 from app.db.database import get_db
-from app.db.models import Group, GroupMember, User
+from app.db.models import Group, GroupMember, User, Message, ConversationSummary
 from app.auth.dependencies import get_current_user
 
 
 router = APIRouter(prefix="/api/groups", tags=["Groups"])
-
 
 
 # ✅ Request Body Schema
@@ -35,16 +34,13 @@ def create_group(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    # Check duplicate name
     existing = db.query(Group).filter(Group.name == body.name).first()
     if existing:
         raise HTTPException(status_code=400, detail="Group name already exists")
 
-    # Create group
     group = Group(
         id=str(uuid.uuid4()),
         name=body.name,
-        # ✅ Save agents into DB
         agents=json.dumps(body.agents),
         created_by=user.id,
         created_at=datetime.utcnow(),
@@ -54,56 +50,42 @@ def create_group(
     db.commit()
     db.refresh(group)
 
-    # ✅ Creator auto joins
     member = GroupMember(group_id=group.id, user_id=user.id)
     db.add(member)
     db.commit()
 
-    # ✅ Add invited members by email
-    added_members = []
+    added_members  = []
     failed_members = []
 
     if body.member_emails:
         for email in body.member_emails:
             email = email.strip().lower()
-            
-            # Skip if it's the creator's email
             if email == user.email.lower():
                 continue
-            
-            # Find user by email
             invited_user = db.query(User).filter(User.email == email).first()
-            
             if not invited_user:
                 failed_members.append({"email": email, "reason": "User not found"})
                 continue
-            
-            # Check if already a member
             existing_member = db.query(GroupMember).filter_by(
-                group_id=group.id,
-                user_id=invited_user.id
+                group_id=group.id, user_id=invited_user.id
             ).first()
-            
             if existing_member:
                 failed_members.append({"email": email, "reason": "Already a member"})
                 continue
-            
-            # Add member
             new_member = GroupMember(group_id=group.id, user_id=invited_user.id)
             db.add(new_member)
             added_members.append({"email": email, "user_id": invited_user.id})
-        
         db.commit()
 
     return {
         "success": True,
         "group": {
-            "id": group.id,
-            "name": group.name,
+            "id":     group.id,
+            "name":   group.name,
             "agents": body.agents,
             "avatar": "👥",
         },
-        "added_members": added_members,
+        "added_members":  added_members,
         "failed_members": failed_members,
     }
 
@@ -121,12 +103,7 @@ def join_group(
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
 
-    existing = (
-        db.query(GroupMember)
-        .filter_by(group_id=group_id, user_id=user.id)
-        .first()
-    )
-
+    existing = db.query(GroupMember).filter_by(group_id=group_id, user_id=user.id).first()
     if existing:
         return {"message": "Already a member"}
 
@@ -145,29 +122,21 @@ def my_groups(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    memberships = (
-        db.query(GroupMember)
-        .filter(GroupMember.user_id == user.id)
-        .all()
-    )
-
-    group_ids = [m.group_id for m in memberships]
-
-    groups = db.query(Group).filter(Group.id.in_(group_ids)).all()
+    memberships = db.query(GroupMember).filter(GroupMember.user_id == user.id).all()
+    group_ids   = [m.group_id for m in memberships]
+    groups      = db.query(Group).filter(Group.id.in_(group_ids)).all()
 
     return {
-    "groups": [
-        {
-            "id": g.id,
-            "name": g.name,
-            "avatar": "💬",
-
-            # ✅ Send agents back to frontend
-            "agents": json.loads(g.agents),
-        }
-        for g in groups
-    ]
-}
+        "groups": [
+            {
+                "id":     g.id,
+                "name":   g.name,
+                "avatar": "💬",
+                "agents": json.loads(g.agents),
+            }
+            for g in groups
+        ]
+    }
 
 
 # ---------------------------------------------------
@@ -180,54 +149,38 @@ def add_members_to_group(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    # Check if group exists
     group = db.query(Group).filter(Group.id == group_id).first()
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
-    
-    # Check if current user is a member (authorization)
-    is_member = db.query(GroupMember).filter_by(
-        group_id=group_id,
-        user_id=user.id
-    ).first()
-    
+
+    is_member = db.query(GroupMember).filter_by(group_id=group_id, user_id=user.id).first()
     if not is_member:
         raise HTTPException(status_code=403, detail="You are not a member of this group")
-    
-    # Add members
-    added_members = []
+
+    added_members  = []
     failed_members = []
-    
+
     for email in body.member_emails:
         email = email.strip().lower()
-        
-        # Find user by email
         invited_user = db.query(User).filter(User.email == email).first()
-        
         if not invited_user:
             failed_members.append({"email": email, "reason": "User not found"})
             continue
-        
-        # Check if already a member
         existing_member = db.query(GroupMember).filter_by(
-            group_id=group_id,
-            user_id=invited_user.id
+            group_id=group_id, user_id=invited_user.id
         ).first()
-        
         if existing_member:
             failed_members.append({"email": email, "reason": "Already a member"})
             continue
-        
-        # Add member
         new_member = GroupMember(group_id=group_id, user_id=invited_user.id)
         db.add(new_member)
         added_members.append({"email": email, "user_id": invited_user.id})
-    
+
     db.commit()
-    
+
     return {
-        "success": True,
-        "added_members": added_members,
+        "success":        True,
+        "added_members":  added_members,
         "failed_members": failed_members,
     }
 
@@ -241,35 +194,59 @@ def get_group_members(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    # Check if group exists
     group = db.query(Group).filter(Group.id == group_id).first()
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
-    
-    # Check if current user is a member
-    is_member = db.query(GroupMember).filter_by(
-        group_id=group_id,
-        user_id=user.id
-    ).first()
-    
+
+    is_member = db.query(GroupMember).filter_by(group_id=group_id, user_id=user.id).first()
     if not is_member:
         raise HTTPException(status_code=403, detail="You are not a member of this group")
-    
-    # Get all members
+
     memberships = db.query(GroupMember).filter(GroupMember.group_id == group_id).all()
-    
+
     members = []
     for membership in memberships:
         member_user = db.query(User).filter(User.id == membership.user_id).first()
         if member_user:
             members.append({
-                "user_id": member_user.id,
-                "email": member_user.email,
+                "user_id":   member_user.id,
+                "email":     member_user.email,
                 "joined_at": membership.joined_at.isoformat() if membership.joined_at else None,
             })
-    
+
     return {
-        "group_id": group_id,
+        "group_id":   group_id,
         "group_name": group.name,
-        "members": members,
+        "members":    members,
     }
+
+
+# ---------------------------------------------------
+# ✅ Delete Group (creator only)
+# ---------------------------------------------------
+@router.delete("/{group_id}")
+def delete_group(
+    group_id: str,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    # Only the creator can delete
+    if str(group.created_by) != str(user.id):
+        raise HTTPException(
+            status_code=403,
+            detail="Only the group creator can delete this group"
+        )
+
+    # Delete in FK order to satisfy constraints
+    db.query(Message).filter(Message.group_id == group_id).delete()
+    db.query(ConversationSummary).filter(ConversationSummary.group_id == group_id).delete()
+    db.query(GroupMember).filter(GroupMember.group_id == group_id).delete()
+    db.query(Group).filter(Group.id == group_id).delete()
+
+    db.commit()
+
+    return {"success": True, "message": f"Group '{group.name}' deleted successfully"}

@@ -36,6 +36,14 @@ export default function App() {
     }
   }, [user]);
 
+  // Called by ChatWindow → ChatHeader after successful delete
+  function handleGroupDeleted(deletedGroupId) {
+    // Remove from sidebar list
+    setGroups((prev) => prev.filter((g) => g.id !== deletedGroupId));
+    // If deleted group was active, clear it → shows empty state
+    setActiveGroup((prev) => (prev?.id === deletedGroupId ? null : prev));
+  }
+
   function logout() {
     localStorage.clear();
     window.location.reload();
@@ -46,7 +54,11 @@ export default function App() {
   }
 
   return (
-    <div data-testid="app-container" className="h-screen w-screen flex" style={{ background: "#0b141a" }}>
+    <div
+      data-testid="app-container"
+      className="h-screen w-screen flex"
+      style={{ background: "#0b141a" }}
+    >
       <Sidebar
         groups={groups}
         activeGroup={activeGroup}
@@ -57,17 +69,40 @@ export default function App() {
       />
 
       {activeGroup && user ? (
-        <ChatWindow group={activeGroup} user={user} />
+        <ChatWindow
+          group={activeGroup}
+          user={user}
+          onGroupDeleted={handleGroupDeleted}
+        />
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center" style={{ background: "#0b141a" }}>
+        <div
+          className="flex-1 flex flex-col items-center justify-center"
+          style={{ background: "#0b141a" }}
+        >
           <div className="text-center">
-            <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: "#202c33" }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8696a0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <div
+              className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+              style={{ background: "#202c33" }}
+            >
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#8696a0"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold" style={{ color: "#e9edef" }}>AgentChat</h3>
-            <p className="text-sm mt-2" style={{ color: "#8696a0" }}>Select a group to start chatting</p>
+            <h3 className="text-xl font-semibold" style={{ color: "#e9edef" }}>
+              AgentChat
+            </h3>
+            <p className="text-sm mt-2" style={{ color: "#8696a0" }}>
+              Select a group to start chatting
+            </p>
           </div>
         </div>
       )}
