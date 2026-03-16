@@ -15,9 +15,21 @@ import AddMembersModal from "./AddMembersModal";
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 const AGENT_STYLES = {
-  agent_research: { color: "#3b82f6", label: "Agent 1", role: "Generator" },
-  agent_analysis: { color: "#f59e0b", label: "Agent 2", role: "Critic" },
-  agent_synthesis: { color: "#8b5cf6", label: "Agent 3", role: "Referee" },
+  agent_research: {
+    color: "#3b82f6",
+    label: "Agent 1",
+    role: "openai/gpt-oss-10b",
+  },
+  agent_analysis: {
+    color: "#f59e0b",
+    label: "Agent 2",
+    role: "meta-llama/llama-4-scout-17b-16e-instruct",
+  },
+  agent_synthesis: {
+    color: "#8b5cf6",
+    label: "Agent 3",
+    role: "moonshotai/kimi-k2-instruct-0905",
+  },
 };
 
 function DeleteGroupModal({ group, onConfirm, onClose, loading }) {
