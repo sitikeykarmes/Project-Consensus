@@ -58,7 +58,7 @@ async def lifespan(app: FastAPI):
     yield
     
     
-app = FastAPI(title="Consensus")
+app = FastAPI(title="Consensus", lifespan=lifespan)
 
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecretkey")
