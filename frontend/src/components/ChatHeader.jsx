@@ -28,7 +28,7 @@ const AGENT_STYLES = {
   agent_synthesis: {
     color: "#8b5cf6",
     label: "Agent 3",
-    role: "moonshotai/kimi-k2-instruct-0905",
+    role: "moonshotai/kimi-k2-instruct",
   },
 };
 
