@@ -298,7 +298,7 @@ Respond ONLY with valid JSON (no markdown fences):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.0,
-            max_tokens=500,
+            max_tokens=4096,
         )
         raw = resp.choices[0].message.content.strip()
         # Strip markdown fences if present
