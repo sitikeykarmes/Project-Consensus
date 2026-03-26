@@ -116,7 +116,7 @@ class LLMAgentClient:
                 if content and content.strip():
                     print(f"✅ {model_key} succeeded on attempt {attempt}")
                     import re
-                    content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+                    content = re.sub(r"<think>.*?(?:</think>|$)", "", content, flags=re.DOTALL).strip()
                     return content
 
                 # ⚠️ Blank response → retry
@@ -178,7 +178,7 @@ class LLMAgentClient:
 
             # Strip Qwen's internal <think>...</think> reasoning block
             import re
-            full_response = re.sub(r"<think>.*?</think>", "", full_response, flags=re.DOTALL).strip()
+            full_response = re.sub(r"<think>.*?(?:</think>|$)", "", full_response, flags=re.DOTALL).strip()
 
             if full_response:
                 print(f"✅ {model_key} streaming completed successfully.")

@@ -28,7 +28,7 @@ class SupportMode:
              "content": CHAT_RULES + "\nRole: Agent 1. Give the main answer briefly."},
             {"role": "user", "content": f"{context_block}\n{user_query}"},
         ]
-        return self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=120)
+        return self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=1024)
 
     def supplementer_agent(self, user_query: str, lead_response: str, context: str = "") -> str:
         context_block = ""
@@ -47,7 +47,7 @@ Agent 1 said:
 Add extra points (no repetition).
 """}
         ]
-        return self.client.get_completion("agent2", messages, temperature=0.7, max_tokens=100)
+        return self.client.get_completion("agent2", messages, temperature=0.7, max_tokens=1500)
 
     def third_agent(self, user_query: str, previous: str, context: str = "") -> str:
         context_block = ""
@@ -67,7 +67,7 @@ So far agents said:
 Add extra final useful points.
 """}
         ]
-        return self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=80)
+        return self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=1024)
 
     def run(self, user_query: str, context: str = "") -> dict:
         print("Running Support Mode...")

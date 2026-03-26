@@ -36,7 +36,7 @@ class IndependentMode:
             "\nRole: Agent 1. Give the first helpful answer.",
             user_query, context
         )
-        content = self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=200)
+        content = self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=1024)
         return {"agent_name": "Agent 1", "content": content, "mode": "independent"}
 
     def agent_2(self, user_query: str, context: str = "") -> dict:
@@ -44,7 +44,7 @@ class IndependentMode:
             "\nRole: Agent 2. Give a different angle or nuance.",
             user_query, context
         )
-        content = self.client.get_completion("agent2", messages, temperature=0.7, max_tokens=120)
+        content = self.client.get_completion("agent2", messages, temperature=0.7, max_tokens=1500)
         return {"agent_name": "Agent 2", "content": content, "mode": "independent"}
 
     def agent_3(self, user_query: str, context: str = "") -> dict:
@@ -52,7 +52,7 @@ class IndependentMode:
             "\nRole: Agent 3. Add a perspective others may miss.",
             user_query, context
         )
-        content = self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=120)
+        content = self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=1024)
         return {"agent_name": "Agent 3", "content": content, "mode": "independent"}
 
     def run(self, user_query: str, context: str = "") -> dict:
