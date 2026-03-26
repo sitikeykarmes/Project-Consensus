@@ -42,23 +42,23 @@ class OppositionMode:
             {
                 "role": "system",
                 "content": CHAT_RULES
-                + "\nRole: Agent 2 (Critic). Challenge or correct Agent 1 briefly."
+                + "\nRole: Agent 2 (Critic). Attack the Generator's logic and highlight flaws or omissions in their answer briefly."
             },
             {
                 "role": "user",
                 "content": f"""{context_block}
 User Query: {user_query}
 
-Agent 1 said:
+Defendant said:
 {generator_text}
 
-Reply with short correction or disagreement.
+Reply with short attack or disagreement.
 """,
             },
         ]
         return self.client.get_completion("agent2", messages, temperature=0.4, max_tokens=90)
 
-    def referee_agent(self, user_query: str, gen: str, critic: str, context: str = "") -> str:
+    def investigator_agent(self, user_query: str, gen: str, critic: str, context: str = "") -> str:
         context_block = ""
         if context:
             context_block = f"\nPrevious conversation context:\n{context}\n"
@@ -67,12 +67,12 @@ Reply with short correction or disagreement.
                 "role": "system",
                 "content": CHAT_RULES
                 + """
-Role: Agent 3 (Referee).
+Role: Agent 3 (Investigator / Fact-Checker).
 Your job:
-- Decide who is more accurate
-- Remove hallucinations
-- Give a short verified verdict
-If debate is settled, say: VERDICT REACHED
+- Strict fact-checking of dates, names, logic, and claims.
+- Read Generator and Critic.
+- Output a concrete Fact-Check Report.
+- Do NOT issue a final verdict.
 """
             },
             {
@@ -80,19 +80,63 @@ If debate is settled, say: VERDICT REACHED
                 "content": f"""{context_block}
 User Query: {user_query}
 
-Agent 1 answer:
+Generator:
 {gen}
 
-Agent 2 critique:
+Critic:
 {critic}
 
-Give a short referee verdict.
+Give a strictly factual investigation report.
 """,
             },
         ]
         return self.client.get_completion("agent3", messages, temperature=0.3, max_tokens=110)
 
-    def generator_update(self, user_query: str, referee_note: str, context: str = "") -> str:
+    def judge_agent(self, user_query: str, gen: str, critic: str, investigation: str, round_no: int, context: str = "") -> str:
+        context_block = ""
+        if context:
+            context_block = f"\nPrevious conversation context:\n{context}\n"
+            
+        round_instruction = ""
+        if round_no < 3:
+            round_instruction = f"This is only Round {round_no}. DO NOT declare 'VERDICT REACHED' yet. Instead, issue an interim judgment and instruct the Generator/Critic on what needs more debate."
+        else:
+            round_instruction = f"This is Round {round_no} (max 5). If the debate is settled, you MUST say: VERDICT REACHED. Otherwise, keep debating."
+            
+        messages = [
+            {
+                "role": "system",
+                "content": CHAT_RULES
+                + f"""
+Role: Agent 4 (Chief Judge).
+Your job:
+- Read Generator, Critic, and Investigator.
+- Decide who is accurate.
+- Issue a binding VERDICT for the Generator to follow.
+{round_instruction}
+"""
+            },
+            {
+                "role": "user",
+                "content": f"""{context_block}
+User Query: {user_query}
+
+Generator:
+{gen}
+
+Critic:
+{critic}
+
+Investigator Fact-Check:
+{investigation}
+
+Give your judge verdict for this round.
+""",
+            },
+        ]
+        return self.client.get_completion("agent4", messages, temperature=0.3, max_tokens=120)
+
+    def generator_update(self, user_query: str, judge_verdict: str, context: str = "") -> str:
         context_block = ""
         if context:
             context_block = f"\nPrevious conversation context:\n{context}\n"
@@ -100,15 +144,15 @@ Give a short referee verdict.
             {
                 "role": "system",
                 "content": CHAT_RULES
-                + "\nRole: Agent 1. Update your answer based on the referee."
+                + "\nRole: Agent 1 (Generator). Update your answer strictly based on the Chief Judge's verdict."
             },
             {
                 "role": "user",
                 "content": f"""{context_block}
 User Query: {user_query}
 
-Referee feedback:
-{referee_note}
+Chief Judge Verdict:
+{judge_verdict}
 
 Now rewrite your answer.
 """,
@@ -117,7 +161,7 @@ Now rewrite your answer.
         return self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=100)
 
     def run(self, user_query: str, context: str = "") -> dict:
-        print("Running Opposition Mode Debate (3-Agent)...")
+        print("Running Opposition Mode Debate (Courtroom Model)...")
         responses = []
 
         generator_text = self.generator_agent(user_query, context)
@@ -135,17 +179,24 @@ Now rewrite your answer.
                 "mode": "opposition"
             })
 
-            referee_text = self.referee_agent(user_query, generator_text, critic_text, context)
+            investigation_text = self.investigator_agent(user_query, generator_text, critic_text, context)
             responses.append({
-                "agent_name": f"Referee (Agent 3) Round {round_no}",
-                "content": referee_text,
+                "agent_name": f"Investigator (Agent 3) Round {round_no}",
+                "content": investigation_text,
                 "mode": "opposition"
             })
 
-            if "verdict reached" in referee_text.lower():
+            judge_text = self.judge_agent(user_query, generator_text, critic_text, investigation_text, round_no, context)
+            responses.append({
+                "agent_name": f"Chief Judge (Agent 4) Round {round_no}",
+                "content": judge_text,
+                "mode": "opposition"
+            })
+
+            if round_no >= 3 and "verdict reached" in judge_text.lower():
                 break
 
-            generator_text = self.generator_update(user_query, referee_text, context)
+            generator_text = self.generator_update(user_query, judge_text, context)
             responses.append({
                 "agent_name": f"Generator Update Round {round_no}",
                 "content": generator_text,

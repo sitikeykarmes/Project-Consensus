@@ -90,6 +90,7 @@ AVAILABLE_AGENTS = [
     {"id": "agent_research",  "name": "Agent 1", "type": "agent", "avatar": "A1"},
     {"id": "agent_analysis",  "name": "Agent 2", "type": "agent", "avatar": "A2"},
     {"id": "agent_synthesis", "name": "Agent 3", "type": "agent", "avatar": "A3"},
+    {"id": "agent_debate",    "name": "Agent 4 (Debate Mode)", "type": "agent", "avatar": "A4"},
 ]
 
 
@@ -152,7 +153,7 @@ def initialize_default_groups():
             "name":              "General Chat",
             "avatar":            "GC",
             "members":           [],
-            "agents":            ["agent_research", "agent_analysis", "agent_synthesis"],
+            "agents":            ["agent_research", "agent_analysis", "agent_synthesis", "agent_debate"],
             "created_at":        datetime.now().isoformat(),
             "last_message":      "Welcome!",
             "last_message_time": datetime.now().isoformat(),

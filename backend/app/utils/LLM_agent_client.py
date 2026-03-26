@@ -30,7 +30,8 @@ class LLMAgentClient:
             },
             "agent2": {
                 "provider": "groq",
-                "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+                "model": "qwen/qwen3-32b",
+                "reasoning_effort": "default",
             },
             "agent3": {
                 "provider": "groq",
@@ -38,13 +39,17 @@ class LLMAgentClient:
             },
             "agent4": {
                 "provider": "groq",
-                "model": "qwen/qwen3-32b",
-                "streaming": True,          # agent4 uses streaming
+                "model": "llama-3.3-70b-versatile",
+            },
+            "agent5": {
+                "provider": "groq",
+                "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+                "streaming": True,          # agent5 uses streaming for synthesis
                 "temperature": 0.6,
                 "top_p": 0.95,
-                "reasoning_effort": "default",
             },
         }
+
 
     # -------------------------------------------------
     # Main Completion Function (Non-Streaming Agents)
@@ -82,6 +87,13 @@ class LLMAgentClient:
         model_name = self.models[model_key]["model"]
 
         # -----------------------------
+        # Boost tokens for reasoning models (they need room to think)
+        # -----------------------------
+        if "qwen" in model_name.lower() or "deepseek" in model_name.lower():
+            if max_tokens < 1024:
+                max_tokens = 1024
+
+        # -----------------------------
         # Internal helper for Groq call
         # -----------------------------
         def _call_model(token_boost: int = 0):
@@ -100,17 +112,24 @@ class LLMAgentClient:
             # -----------------------------------------
             # Retry Attempts (4 total)
             # -----------------------------------------
-            token_boosts = [400, 500, 600, 700]
+            token_boosts = [400, 800, 1200, 2000]
 
             for attempt, boost in enumerate(token_boosts, start=1):
 
                 completion = _call_model(token_boost=boost)
                 content = completion.choices[0].message.content
 
-                # ✅ If valid response, return immediately
+                # ✅ If valid response, check if it's usable after stripping thoughts
                 if content and content.strip():
-                    print(f"✅ {model_key} succeeded on attempt {attempt}")
-                    return content.strip()
+                    import re
+                    stripped_content = re.sub(r"<think>.*?(</think>|$)", "", content, flags=re.DOTALL).strip()
+                    
+                    if stripped_content:
+                        print(f"✅ {model_key} succeeded on attempt {attempt}")
+                        return stripped_content
+                    else:
+                        print(f"⚠️ {model_key} attempt {attempt} only returned a <think> block that got cut off. Retrying with more tokens...")
+                        continue
 
                 # ⚠️ Blank response → retry
                 print(
@@ -148,16 +167,19 @@ class LLMAgentClient:
         try:
             print(f"🔄 Requesting {model_key} ({model_name}) via Groq [streaming]...")
 
-            completion = self.groq_client.chat.completions.create(
-                model=model_name,
-                messages=messages,
-                temperature=model_config.get("temperature", 0.6),
-                max_completion_tokens=max_tokens,
-                top_p=model_config.get("top_p", 0.95),
-                reasoning_effort=model_config.get("reasoning_effort", "default"),
-                stream=True,
-                stop=None,
-            )
+            kwargs = {
+                "model": model_name,
+                "messages": messages,
+                "temperature": model_config.get("temperature", 0.6),
+                "max_completion_tokens": max_tokens,
+                "top_p": model_config.get("top_p", 0.95),
+                "stream": True,
+                "stop": None,
+            }
+            if "reasoning_effort" in model_config:
+                kwargs["reasoning_effort"] = model_config["reasoning_effort"]
+
+            completion = self.groq_client.chat.completions.create(**kwargs)
 
             # Collect all streamed chunks into a single string
             full_response = ""

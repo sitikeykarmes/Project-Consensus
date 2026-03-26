@@ -75,10 +75,19 @@ class Orchestrator:
     
     def synthesize_consensus(self, original_query: str, agent_results: dict, context_str: str = "", mode: str = "") -> str:
         """Synthesize final consensus from agent responses using agent4 (qwen/qwen3-32b)"""
-        responses_text = "\n\n".join([
-            f"{r['agent_name']}: {r['content']}" 
-            for r in agent_results["responses"]
-        ])
+        # To avoid Groq TPM limit errors on free tiers, truncate long Opposition mode logs
+        # We only pass the FINAL round (last 4 messages) to the synthesis agent
+        if mode == "opposition" and len(agent_results.get("responses", [])) > 5:
+            subset = agent_results["responses"][-4:]
+            responses_text = "(Debate was very long. Showing only the final resolved round:)\n\n" + "\n\n".join([
+                f"{r['agent_name']}: {r['content']}" 
+                for r in subset
+            ])
+        else:
+            responses_text = "\n\n".join([
+                f"{r['agent_name']}: {r['content']}" 
+                for r in agent_results["responses"]
+            ])
         
         context_section = ""
         if context_str:
@@ -167,8 +176,8 @@ Now give the final answer:"""
                 {"role": "user", "content": synthesis_prompt}
             ]
 
-            # agent4 = qwen/qwen3-32b (streaming internally, returns full string)
-            return self.consensus_client.get_completion("agent4", messages, max_tokens=4096)
+            # agent5 = meta-llama/llama-4-scout-17b-16e-instruct (streaming internally, returns full string)
+            return self.consensus_client.get_completion("agent5", messages, max_tokens=4096)
             
         except Exception as e:
             return f"Error in synthesis: {e}"

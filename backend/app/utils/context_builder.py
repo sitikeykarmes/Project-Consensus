@@ -32,9 +32,8 @@ MAX_SUMMARY_CHARS   = 6000   # max characters of conversation text sent for summ
 _llm_client = LLMAgentClient()
 
 # Fallback model order for summarization
-# agent4 (Qwen) is best but has low TPM on free tier
-# agent3 (Kimi) and agent1 (GPT-OSS) used as fallbacks
-_SUMMARY_MODEL_FALLBACK = ["agent4", "agent3", "agent1"]
+# agent5 (Llama Scout) or agent4 (Llama 70B)
+_SUMMARY_MODEL_FALLBACK = ["agent5", "agent4", "agent1"]
 
 
 # ── Public API ───────────────────────────────────────────────────────────────────
@@ -191,12 +190,12 @@ def _maybe_update_summary(db: Session, group_id: str):
         for m in msgs_to_summarize
     ])
 
-    # ── Truncate to stay within model token limits ────────────────────────────
-    original_chars = len(convo_text)
-    convo_text     = _truncate_to_char_limit(convo_text, MAX_SUMMARY_CHARS)
-    if len(convo_text) < original_chars:
-        print(f"✂️  Conversation truncated: {original_chars} → {len(convo_text)} chars "
-              f"to stay within token limit.")
+    # ── Truncation removed: Llama-4-Scout has a high token limit ────────────
+    # original_chars = len(convo_text)
+    # convo_text     = _truncate_to_char_limit(convo_text, MAX_SUMMARY_CHARS)
+    # if len(convo_text) < original_chars:
+    #     print(f"✂️  Conversation truncated: {original_chars} → {len(convo_text)} chars "
+    #           f"to stay within token limit.")
 
     existing_summary = summary_row.summary_text if summary_row else ""
     new_summary      = _generate_summary(convo_text, existing_summary)
