@@ -91,6 +91,7 @@ AVAILABLE_AGENTS = [
     {"id": "agent_analysis",  "name": "Agent 2", "type": "agent", "avatar": "A2"},
     {"id": "agent_synthesis", "name": "Agent 3", "type": "agent", "avatar": "A3"},
     {"id": "agent_debate",    "name": "Agent 4 (Debate Mode)", "type": "agent", "avatar": "A4"},
+    {"id": "agent_orchestrator", "name": "Agent 5 (Synthesis)", "type": "agent", "avatar": "A5"},
 ]
 
 

@@ -18,18 +18,28 @@ const AGENT_STYLES = {
   agent_research: {
     color: "#3b82f6",
     label: "Agent 1",
-    role: "openai/gpt-oss-10b",
+    role: "openai/gpt-oss-120b",
   },
   agent_analysis: {
     color: "#f59e0b",
     label: "Agent 2",
-    role: "meta-llama/llama-4-scout-17b-16e-instruct",
+    role: "qwen/qwen3-32b",
   },
   agent_synthesis: {
     color: "#8b5cf6",
     label: "Agent 3",
     role: "moonshotai/kimi-k2-instruct",
   },
+  agent_debate: {
+    color: "#ec4899",
+    label: "Agent 4",
+    role: "llama-3.3-70b-versatile",
+  },
+  agent_orchestrator: {
+    color: "#10b981",
+    label: "Agent 5",
+    role: "meta-llama/llama-4-scout",
+  }
 };
 
 function DeleteGroupModal({ group, onConfirm, onClose, loading }) {

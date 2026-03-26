@@ -1,0 +1,131 @@
+* [33mc66bf4a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Changed Role of LLMs, Update Debate Mechanism, etc
+* [33m528929d[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Changed Role of LLMs, Update Debate Mechanism, etc
+* [33m1d926a3[m Evaluator Update
+* [33m8e51745[m AI Role Update
+* [33m166a3e5[m Update
+* [33m31f31b7[m Add Group Delete Option
+* [33m7eca45e[m Update
+* [33mf0c2d3c[m Update
+* [33mc994cee[m feat: keep-alive self ping_new
+* [33mbffa1a1[m feat: keep-alive self ping
+* [33mee39163[m ChatWindow Update
+* [33m1df4afb[m Update
+* [33m65b6765[m Update
+* [33m73e2def[m backend/app/main.py Update
+* [33mbb08243[m backend/app/main.py Update
+* [33mceb9672[m file update
+* [33m7104e9d[m ready for deployment
+* [33me44a3a6[m ready for deployment
+* [33m88ee690[m ready for deployment
+* [33m2cc85b3[m Update README File
+* [33m5640b80[m Enhanced Synthesis Engine, Introduced Code block, Formatting, and Performance Evaluator
+* [33m48ef354[m Conversation Summary Update
+* [33mbfd5ed7[m Conversation Summary
+* [33m708673c[m Update
+* [33m47102cb[m Enabled Context Awareness Update
+* [33m3af7d01[m Enabled context
+* [33m5d6e763[m Resolved merge conflict
+* [33m1efb6fc[m Auto-generated changes
+* [33md3c8065[m auto-commit for 4770e867-44f5-4fab-8182-5a62a3b09cf7
+* [33m892f356[m auto-commit for cc718126-2269-4648-94ef-60c34218990b
+* [33m4c9c052[m auto-commit for 23d2235f-0732-44a1-b20b-9ea7c5985aaa
+* [33mf51260d[m auto-commit for d88432c2-75f8-4e48-8834-4b2ebe74a59c
+* [33me5bc799[m auto-commit for 2755ed0b-3f56-447a-bfc2-4c60b873dcf7
+* [33m7794a77[m auto-commit for 56440d10-ed6a-46be-86cb-edc499af2abe
+* [33mb27478f[m auto-commit for ba18aa48-5913-4140-a117-84abc8bf6a8f
+* [33mad729a6[m auto-commit for 3fdf83ef-39d5-42af-bc11-14613f4468aa
+* [33m4b387d0[m auto-commit for 7d663e74-ea60-4a19-9c24-e982d4fcd58c
+* [33m39a3b12[m auto-commit for 0c8419c0-532d-4697-aee0-bf6e2ffe5c1a
+* [33mf589bf1[m auto-commit for baab862f-b40a-41e5-8f7b-0f9dba77907f
+* [33m284327a[m auto-commit for 4e279738-9372-436a-b4a5-2ac28f112396
+* [33mead2b15[m auto-commit for a2c8b398-1322-4351-8ec8-335c284d68d4
+* [33mbbc74ab[m auto-commit for 14455a10-0673-40ad-a578-a194e64b04ad
+* [33m16d1883[m auto-commit for 702813e5-c286-4789-b596-0cecd471fadb
+* [33m06a9304[m auto-commit for 5f67e0ce-2592-49a0-811e-c40fa7ca83fe
+* [33m11b063c[m auto-commit for 15977f69-0391-44f8-bef7-d60fe4e5ce4d
+* [33mb04c4c3[m auto-commit for f54bae83-b92a-4a5a-b29b-aa1421c48c76
+* [33m01142d3[m auto-commit for bbe83803-fdb6-4be5-a1cb-1dddc8dc82a2
+* [33m3812050[m auto-commit for 4e5e2916-09e0-4232-8690-a252cf642c5d
+* [33m269a0f1[m auto-commit for d856b382-2a8b-4d61-a6f8-cc781ca303e2
+* [33m7776cff[m auto-commit for 19ce198a-051b-4200-bf46-6a132af4935a
+* [33m378cc61[m auto-commit for b9936e64-7336-423b-b09a-70d7296fec32
+* [33m0863277[m auto-commit for a21c9d8b-da2d-478d-9d14-fe6483bde8bd
+* [33m48bf991[m auto-commit for 5951e94b-7531-49c4-b09a-2b67af83ff85
+* [33m1c926c6[m auto-commit for 9d27b0a4-a11d-46c0-8150-6fed93f33ecc
+* [33m20cdc5c[m auto-commit for 00920c33-5b58-4eb4-bb92-db3476bd6d94
+* [33m5bb180c[m auto-commit for 1b69da32-f354-45af-9fd8-7b872506fd31
+* [33m8a971cb[m auto-commit for 92e82943-ca9e-4e9f-a92a-1e4e51c5b035
+* [33m8a60cb2[m auto-commit for 6e1ed661-f786-4019-88ff-aa97f5d4af87
+* [33m3ef535b[m auto-commit for 512b42d4-8a1a-4188-b4af-49294a49236c
+* [33me316c77[m auto-commit for 174c57fd-0df2-4295-9a90-902aa660f52c
+* [33m962387d[m auto-commit for b46403ec-0acc-4009-943d-61d3ef2e0d3e
+* [33mae0f487[m auto-commit for 257f07b4-215d-4170-952e-8758bd0e0484
+* [33m64c8883[m auto-commit for 2b97c783-0315-40fe-bfec-4190cea74cad
+* [33mea9d49a[m auto-commit for 84b576c4-9ce0-4be0-ba8e-58a5ae7c6a22
+* [33m87c0a2b[m auto-commit for 56ce8a8e-7d8d-4e09-8763-3ab918480dcc
+* [33m501531f[m auto-commit for f65cacfa-2a8d-40a6-8274-ef865a20b562
+* [33m9ae3ad7[m auto-commit for 72fcd542-78d0-4419-8595-b1fd80ae638e
+* [33m8fd3e8d[m auto-commit for 8c44d18d-ec7d-454a-921c-890c0174cc2a
+* [33m2b6217e[m auto-commit for b596b38e-56ab-48c8-845b-7e9c90ae0aa8
+* [33m1f27474[m auto-commit for efef93b8-af21-4bfa-a868-1eadccc19b67
+* [33m913ece1[m auto-commit for 10553e5b-eb49-4972-b035-1a462398cc85
+* [33m22e9f4f[m auto-commit for d3488282-2219-4498-8628-a3bfd0acf479
+* [33m3eae4cc[m auto-commit for 1a90f801-e1e4-4141-826b-5f5010f3dc56
+* [33m39ca7e3[m auto-commit for 99d3fd23-74f7-4138-bfeb-d0a70b72048c
+* [33m3db476d[m auto-commit for d21c5063-65c6-4570-8c95-966da8dffb03
+* [33m5bac163[m auto-commit for 0b7f23c3-7dfd-4feb-9053-26cb4f85c3e5
+* [33m409a2e1[m auto-commit for 01f57d75-5470-454a-abf5-f3979bec0d01
+* [33m64800b6[m auto-commit for 4b87a9ca-97fd-4f1a-82c4-cb6753b1b9e9
+* [33m05bb6ad[m auto-commit for 14e645fc-f57e-48ce-9dae-b2c401f51566
+* [33mace78b2[m auto-commit for 5a9d85d6-af83-4877-8280-867d5cc5eb3a
+* [33m4129962[m auto-commit for 9335f39b-273c-4c1d-8a78-aca1b66d2f47
+* [33me5021a3[m auto-commit for 1609d76b-3d17-415c-88a7-ee5caca188a4
+* [33mac5eef4[m auto-commit for 40b0057d-92c2-4d2a-a2fe-a78cb8677627
+[31m|[m * [33m8f866f7[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on main: 278a658 Established basic multi-user
+[31m|[m[31m/[m[33m|[m 
+[31m|[m * [33m6126382[m index on main: 278a658 Established basic multi-user
+[31m|[m[31m/[m  
+* [33m278a658[m Established basic multi-user
+* [33m8eb28d6[m Established basic multi-user
+* [33m462632f[m Login Page Added
+* [33m6922f47[m Database Integration
+* [33m3db6d43[m Backend Pipeline Update
+* [33m56e8df0[m System Prompt update
+* [33ma397157[m Frontend Dev
+* [33m9d9a133[m EmergeUpdate
+* [33m70710e3[m auto-commit for 35916add-664d-437f-9364-cc17477c3abe
+* [33me97316d[m auto-commit for b21c6fad-75b1-47af-9c61-d9fc3673ee11
+* [33m6524e35[m auto-commit for ab987d3f-bdb0-4977-9d87-b5c6e16059df
+* [33m4d1fa0a[m auto-commit for f56a321a-b1b3-4e5a-8264-73842866f07f
+* [33m0eac94b[m auto-commit for 7980a277-0e34-45bf-b925-07cd8f75c6e1
+* [33mb498f2c[m auto-commit for 9a32512f-b0c1-48ee-94f7-ba5ac1330505
+* [33me03f0c5[m auto-commit for 7fd9d990-01f9-4e7f-b5a4-0100c3e2a445
+* [33m76c5801[m auto-commit for 0e935acc-0aa4-41b4-87f7-4dbc18229db9
+* [33mc2dd36c[m auto-commit for 4f772678-4104-43b0-9e50-4c07e0c6c766
+* [33m7a19687[m Update
+* [33m2f25a17[m Update
+* [33m7312dc7[m auto-commit for 2fa71a93-c868-427b-8f0b-5a1a32577693
+* [33m14c46fa[m auto-commit for a86bf646-9d81-490e-80fd-332fd0448930
+* [33m123586d[m auto-commit for 51d7c711-e92b-4648-b6e8-96ed722bcaed
+* [33mb48b712[m auto-commit for f8763392-f236-4aa4-b5dc-bcbfb4bacd5c
+* [33mb1f8e22[m auto-commit for d5a008bc-0e3f-4abb-b342-00a4f404c314
+* [33mb71c7a6[m auto-commit for 875c4ad7-a70d-42fc-a39a-15f4f79b5ab8
+* [33m2a600dc[m auto-commit for 96d95f31-560a-487d-b986-e34efc1de382
+* [33m576c189[m auto-commit for 817e51ce-accc-43ca-9e12-9203a14bc6f4
+* [33m8a6c1a8[m auto-commit for 7b4bb08b-5eb2-4326-a821-81b474b0e95b
+* [33m40f5002[m auto-commit for fa4fb9aa-4c44-4dd2-a318-b18c924dde08
+* [33m3822e45[m auto-commit for c159db6a-907b-4331-9ae1-898f31ef04e7
+* [33m70bb0b5[m auto-commit for 5da29eea-578e-4773-9bce-61152cde66c9
+* [33m3ee7082[m Frontend Update
+* [33m8aac62e[m auto-commit for ded0fc97-7521-430e-83c0-fc0326ebfacd
+* [33m2bc5dab[m auto-commit for edc16bcb-0f9c-42a3-a9d7-21c950434d32
+* [33m326e9b6[m auto-commit for dc0aa162-f8c0-4e8f-bf1c-2e9f151871e4
+* [33mce226c2[m auto-commit for 2dd56910-4a44-4786-a6f2-a79dc9177d1d
+* [33m99037d1[m auto-commit for 289f84f6-d010-4d60-b7f7-3541e05e8aff
+* [33m71ece88[m auto-commit for aa1c54e9-e506-4163-b3d0-e460b653d9ab
+* [33mdc711c3[m auto-commit for b126468a-da7b-4a8b-a295-0751a8c0ae2a
+* [33meb91e73[m Setup Frontend
+* [33m5363548[m Update  Agent 2
+* [33mbb7dbbb[m Update 3 Agents
+* [33mbc705da[m First Commit
+* [33m571e9aa[m First Commit
