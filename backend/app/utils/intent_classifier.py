@@ -14,9 +14,9 @@ class IntentClassifier:
         """
         # Fast-lane Regex bypass to save API tokens
         _q = user_query.strip().lower()
-        if len(_q) < 4:
+        if len(_q) < 3:
             return False
-        if _q.startswith("@ai") or _q.startswith("@agent"):
+        if _q.startswith("@ai") or _q.startswith("@agent") or _q == "ai?":
             return True
 
         system_prompt = """You are an invisible AI eavesdropper monitoring a human group chat.
@@ -28,6 +28,7 @@ Reply "YES" if:
 2. The message commands/prompts the AI (e.g. "Write me a summary", "Give me 3 options").
 3. The user explicitly asks for help, data, or verification.
 4. The user explicitly addresses or greets the AI directly (e.g., "how are you AIs", "@AI", "Hey agents").
+5. The message introduces a specific topic strongly implying an AI command (e.g., "Debate: X vs Y", "Topic: Z").
 
 Reply "NO" if:
 1. The users are just greeting each other (e.g. "Hello everyone", "Good morning", "Hi").
