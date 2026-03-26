@@ -333,7 +333,8 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             conversation_history = hybrid_ctx["conversation_history"]
 
             # Execute orchestrator with hybrid context
-            result = orchestrator.execute_query(
+            result = await asyncio.to_thread(
+                orchestrator.execute_query,
                 user_message,
                 conversation_history=conversation_history,
             )
