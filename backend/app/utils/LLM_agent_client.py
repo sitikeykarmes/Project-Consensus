@@ -87,13 +87,6 @@ class LLMAgentClient:
         model_name = self.models[model_key]["model"]
 
         # -----------------------------
-        # Boost tokens for reasoning models (they need room to think)
-        # -----------------------------
-        if "qwen" in model_name.lower() or "deepseek" in model_name.lower():
-            if max_tokens < 1024:
-                max_tokens = 1024
-
-        # -----------------------------
         # Internal helper for Groq call
         # -----------------------------
         def _call_model(token_boost: int = 0):
@@ -112,24 +105,19 @@ class LLMAgentClient:
             # -----------------------------------------
             # Retry Attempts (4 total)
             # -----------------------------------------
-            token_boosts = [400, 800, 1200, 2000]
+            token_boosts = [400, 500, 600, 700]
 
             for attempt, boost in enumerate(token_boosts, start=1):
 
                 completion = _call_model(token_boost=boost)
                 content = completion.choices[0].message.content
 
-                # ✅ If valid response, check if it's usable after stripping thoughts
+                # ✅ If valid response, return immediately
                 if content and content.strip():
+                    print(f"✅ {model_key} succeeded on attempt {attempt}")
                     import re
-                    stripped_content = re.sub(r"<think>.*?(</think>|$)", "", content, flags=re.DOTALL).strip()
-                    
-                    if stripped_content:
-                        print(f"✅ {model_key} succeeded on attempt {attempt}")
-                        return stripped_content
-                    else:
-                        print(f"⚠️ {model_key} attempt {attempt} only returned a <think> block that got cut off. Retrying with more tokens...")
-                        continue
+                    content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+                    return content
 
                 # ⚠️ Blank response → retry
                 print(
