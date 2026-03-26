@@ -16,7 +16,10 @@ class IntentClassifier:
         _q = user_query.strip().lower()
         if len(_q) < 3:
             return False
-        if _q.startswith("@ai") or _q.startswith("@agent") or _q == "ai?":
+            
+        # Hardcoded action keywords that instantly trigger AI response without wasting tokens on 8B Gatekeeper
+        action_keywords = ["@ai", "@agent", "ai?", "debate", "explain", "compare", "write", "list", "summarize"]
+        if any(_q.startswith(kw) for kw in action_keywords):
             return True
 
         system_prompt = """You are an invisible AI eavesdropper monitoring a human group chat.
