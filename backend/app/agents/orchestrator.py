@@ -15,6 +15,11 @@ class Orchestrator:
         self.independent_mode = IndependentMode()
         self.consensus_client = LLMAgentClient()
     
+    def check_if_ai_needed(self, user_query: str, conversation_history: list = None) -> bool:
+        """Fast gatekeeper check to prevent orchestrating idle chat."""
+        context_str = self._build_context_str(conversation_history)
+        return self.intent_classifier.should_invoke_ai(user_query, context_str)
+
     def execute_query(self, user_query: str, conversation_history: list = None, mode_override: str = None) -> dict:
         """Main orchestration logic with conversation context"""
         

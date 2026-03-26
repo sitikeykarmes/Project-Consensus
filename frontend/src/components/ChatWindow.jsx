@@ -101,7 +101,6 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
     };
 
     setMessages((prev) => [...prev, optimisticMsg]);
-    setIsAiTyping(true);
     socketRef.current.send(JSON.stringify({ message: text }));
   }
 

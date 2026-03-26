@@ -7,6 +7,57 @@ class IntentClassifier:
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
         self.model = "llama-3.3-70b-versatile"
     
+    def should_invoke_ai(self, user_query: str, context: str = "") -> bool:
+        """
+        Acts as a zero-latency Gatekeeper.
+        Analyzes the human group chat message to decide if AI orchestration is needed.
+        """
+        # Fast-lane Regex bypass to save API tokens
+        _q = user_query.strip().lower()
+        if len(_q) < 4:
+            return False
+        if _q.startswith("@ai") or _q.startswith("@agent"):
+            return True
+
+        system_prompt = """You are an invisible AI eavesdropper monitoring a human group chat.
+Your ONLY job is to decide if the AI pipeline needs to run for the latest message.
+
+STRICT RULES
+Reply "YES" if:
+1. The message asks a direct question to the AI or for general knowledge (e.g. "What is X?", "How do I fix Y?").
+2. The message commands/prompts the AI (e.g. "Write me a summary", "Give me 3 options").
+3. The user explicitly asks for help, data, or verification.
+4. The user explicitly addresses or greets the AI directly (e.g., "how are you AIs", "@AI", "Hey agents").
+
+Reply "NO" if:
+1. The users are just greeting each other (e.g. "Hello everyone", "Good morning", "Hi").
+2. The user is asking a SPECIFIC human user a question (e.g. "User1, can you tell me...", "@John what do you think?").
+3. The user is asking a follow-up question to ANOTHER HUMAN based on previous chat context (e.g. "at what time?", "where exactly?").
+4. The user is just agreeing/chatting (e.g. "Sounds good", "I agree", "lol", "ok").
+5. The message is ambiguous casual chatter without a clear request.
+
+Return EXACTLY ONE WORD: either YES or NO. Nothing else."""
+
+        try:
+            context_prefix = f"Recent Chat History:\n{context}\n\n" if context else ""
+
+            # We use an ultra-fast model or our default fast model for this gatekeeper
+            response = self.client.chat.completions.create(
+                model="llama-3.1-8b-instant", # specifically designed for <100ms classification
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"{context_prefix}Decide if this LAST message needs AI generation: '{user_query}'"}
+                ],
+                temperature=0.0,
+                max_tokens=5
+            )
+            
+            answer = response.choices[0].message.content.strip().upper()
+            return "YES" in answer
+        except Exception as e:
+            print(f"❌ Gatekeeper Error: {e}")
+            return True  # If gatekeeper fails, default to YES so we don't accidentally ignore real queries
+
     def classify(self, user_query: str, context: str = "") -> str:
         """
         Classifies user intent into one of three multi-agent orchestration modes:

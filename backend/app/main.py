@@ -313,6 +313,26 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             if not agents:
                 continue
 
+            # ── Check if AI is even needed before showing typing indicator ──
+            db = SessionLocal()
+            try:
+                hybrid_ctx = build_hybrid_context(db, room_id)
+            finally:
+                db.close()
+
+            conversation_history = hybrid_ctx["conversation_history"]
+
+            # Fast gatekeeper check against human chatter
+            is_needed = await asyncio.to_thread(
+                orchestrator.check_if_ai_needed,
+                user_message,
+                conversation_history
+            )
+            
+            if not is_needed:
+                print(f"🛑 Gatekeeper blocked AI invocation for user message: '{user_message}'")
+                continue
+
             # Typing indicator
             await manager.broadcast_to_room(
                 {
@@ -322,15 +342,6 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 },
                 room_id,
             )
-
-            # ── Build hybrid context (summary + recent 15 verbatim) ──
-            db = SessionLocal()
-            try:
-                hybrid_ctx = build_hybrid_context(db, room_id)
-            finally:
-                db.close()
-
-            conversation_history = hybrid_ctx["conversation_history"]
 
             # Execute orchestrator with hybrid context
             result = await asyncio.to_thread(
