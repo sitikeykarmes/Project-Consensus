@@ -123,20 +123,52 @@ def my_groups(
     user=Depends(get_current_user),
 ):
     memberships = db.query(GroupMember).filter(GroupMember.user_id == user.id).all()
-    group_ids   = [m.group_id for m in memberships]
-    groups      = db.query(Group).filter(Group.id.in_(group_ids)).all()
+    group_map = {m.group_id: m for m in memberships}
+    group_ids = list(group_map.keys())
+    groups = db.query(Group).filter(Group.id.in_(group_ids)).all()
 
-    return {
-        "groups": [
-            {
-                "id":     g.id,
-                "name":   g.name,
-                "avatar": "💬",
-                "agents": json.loads(g.agents),
-            }
-            for g in groups
-        ]
-    }
+    # Import helper for consistent UTC timestamps
+    from app.main import serialize_dt
+
+    results = []
+    for g in groups:
+        member = group_map[g.id]
+        last_msg = db.query(Message).filter(Message.group_id == g.id).order_by(Message.timestamp.desc()).first()
+        
+        unread_count = 0
+        if member.last_read_at and last_msg:
+            # Only count messages sent after exactly when the user last read this room
+            unread_count = db.query(Message).filter(Message.group_id == g.id, Message.timestamp > member.last_read_at).count()
+
+        results.append({
+            "id":     g.id,
+            "name":   g.name,
+            "avatar": "💬",
+            "agents": json.loads(g.agents) if g.agents else [],
+            "last_message_content": last_msg.content if last_msg else "No messages yet",
+            "last_message_time": serialize_dt(last_msg.timestamp) if last_msg else serialize_dt(g.created_at),
+            "unread_count": unread_count
+        })
+
+    # Pre-sort on backend for efficiency
+    results.sort(key=lambda x: x["last_message_time"], reverse=True)
+
+    return {"groups": results}
+
+# ---------------------------------------------------
+# ✅ Mark Group Read (Reset Unread Counter)
+# ---------------------------------------------------
+@router.post("/{group_id}/read")
+def mark_group_read(
+    group_id: str,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    membership = db.query(GroupMember).filter_by(group_id=group_id, user_id=user.id).first()
+    if membership:
+        membership.last_read_at = datetime.utcnow()
+        db.commit()
+    return {"success": True}
 
 
 # ---------------------------------------------------

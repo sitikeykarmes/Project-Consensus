@@ -98,7 +98,7 @@ function DeleteGroupModal({ group, onConfirm, onClose, loading }) {
 }
 
 function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
-  const agents = group.agents || [];
+  const agents = (group.agents || []).filter(a => a !== "agent_orchestrator");
 
   return (
     <div
@@ -208,6 +208,36 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
                   </div>
                 );
               })}
+            </div>
+
+            {/* OMNIPRESENT SYNTHESIS AGENT */}
+            <div
+              className="mt-4 p-3 rounded-xl flex items-center gap-3"
+              style={{
+                background: "rgba(16, 185, 129, 0.1)",
+                border: "1px solid rgba(16, 185, 129, 0.2)",
+              }}
+            >
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                style={{
+                  background: "rgba(16, 185, 129, 0.2)",
+                  color: "#10b981",
+                }}
+              >
+                SA
+              </div>
+              <div>
+                <p
+                  className="text-[11px] font-bold uppercase tracking-wider mb-0.5"
+                  style={{ color: "#10b981" }}
+                >
+                  Consensus Synthesis Agent
+                </p>
+                <p className="text-[10px]" style={{ color: "#8696a0" }}>
+                  {AGENT_STYLES.agent_orchestrator.role}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -377,7 +407,7 @@ export default function ChatHeader({ group, connected, onGroupDeleted }) {
               style={{ color: "#8696a0" }}
             >
               <span className="flex items-center gap-1">
-                <Bot size={11} /> {group.agents?.length || 0} agents
+                <Bot size={11} /> {(group.agents || []).filter(a => a !== "agent_orchestrator").length} agents
               </span>
               <span className="flex items-center gap-1">
                 <Users size={11} /> {members.length} members

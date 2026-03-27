@@ -16,24 +16,37 @@ export default function App() {
     }
   }, []);
 
-  async function loadGroups() {
+  async function loadGroups(silent = false) {
     const token = localStorage.getItem("token");
     if (!token) {
       logout();
       return;
     }
-    const data = await fetchGroups(token);
-    const groupList = data?.groups || [];
-    setGroups(groupList);
-    if (!activeGroup && groupList.length > 0) {
-      setActiveGroup(groupList[0]);
+    try {
+      const data = await fetchGroups(token);
+      const groupList = data?.groups || [];
+      setGroups(groupList);
+      if (!activeGroup && groupList.length > 0 && !silent) {
+        setActiveGroup(groupList[0]);
+      }
+    } catch (error) {
+      if (error.message === "UNAUTHORIZED") {
+        logout();
+      } else {
+        console.error("Failed to load groups:", error);
+      }
     }
   }
 
   useEffect(() => {
+    let interval;
     if (user) {
       loadGroups();
+      interval = setInterval(() => {
+        loadGroups(true);
+      }, 5000);
     }
+    return () => clearInterval(interval);
   }, [user]);
 
   // Called by ChatWindow → ChatHeader after successful delete

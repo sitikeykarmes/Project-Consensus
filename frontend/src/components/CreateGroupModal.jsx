@@ -16,7 +16,7 @@ export default function CreateGroupModal({ close, reloadGroups }) {
     async function loadAgents() {
       try {
         const data = await fetchAgents();
-        setAgents(data.agents);
+        setAgents(data.agents.filter(a => a.id !== "agent_orchestrator"));
       } catch (err) {
         console.error("Failed to load agents");
       }

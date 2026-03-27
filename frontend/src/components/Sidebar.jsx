@@ -148,18 +148,35 @@ export default function Sidebar({
                   {getInitials(group.name)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p
-                    className="text-sm font-semibold truncate"
-                    style={{ color: "#e9edef" }}
-                  >
-                    {group.name}
-                  </p>
-                  <p
-                    className="text-xs truncate mt-0.5"
-                    style={{ color: "#8696a0" }}
-                  >
-                    {group.agents?.length || 0} agents
-                  </p>
+                  <div className="flex justify-between items-baseline mb-0.5">
+                    <p
+                      className="text-sm font-semibold truncate"
+                      style={{ color: "#e9edef" }}
+                    >
+                      {group.name}
+                    </p>
+                    {group.last_message_time && (
+                      <p className="text-[10px] whitespace-nowrap ml-2" style={{ color: group.unread_count > 0 ? "#00a884" : "#8696a0" }}>
+                        {new Date(group.last_message_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center mt-0.5">
+                    <p
+                      className="text-xs truncate flex-1"
+                      style={{ color: "#8696a0", minWidth: 0 }}
+                    >
+                      {group.last_message_content || `${group.agents?.length || 0} agents`}
+                    </p>
+                    {group.unread_count > 0 && !isActive && (
+                      <div 
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ml-2 shrink-0"
+                        style={{ background: "#00a884", color: "#111b21" }}
+                      >
+                        {group.unread_count}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );

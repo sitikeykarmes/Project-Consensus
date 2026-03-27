@@ -27,12 +27,25 @@ from app.agents.orchestrator import Orchestrator
 
 from typing import Dict, List
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 import os
 
 from dotenv import load_dotenv
 from pathlib import Path
+
+def get_utc_now_str() -> str:
+    # Generates a strict UTC ISO string (e.g. 2026-03-27T18:50:00+00:00)
+    return datetime.now(timezone.utc).isoformat()
+
+def serialize_dt(dt: datetime) -> str:
+    # Guarantees naive DB datetimes are treated as UTC by JavaScript by appending Z
+    if not dt:
+        return ""
+    iso = dt.isoformat()
+    if not iso.endswith("Z") and "+" not in iso:
+        return iso + "Z"
+    return iso
 
 
 env_path = Path(__file__).parent.parent / ".env"
@@ -155,9 +168,9 @@ def initialize_default_groups():
             "avatar":            "GC",
             "members":           [],
             "agents":            ["agent_research", "agent_analysis", "agent_synthesis", "agent_debate"],
-            "created_at":        datetime.now().isoformat(),
+            "created_at":        get_utc_now_str(),
             "last_message":      "Welcome!",
-            "last_message_time": datetime.now().isoformat(),
+            "last_message_time": get_utc_now_str(),
         }
 
 initialize_default_groups()
@@ -233,7 +246,8 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 "sender_id":   msg.sender_id,
                 "sender_name": msg.sender_name,
                 "content":     msg.content,
-                "timestamp":   msg.timestamp.isoformat(),
+                "timestamp":   serialize_dt(msg.timestamp),
+                "historical":  True,
             }
             if msg.sender_type == "consensus" and msg.extra_data:
                 try:
@@ -255,7 +269,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             "type":         "user_joined",
             "user_name":    user_email,
             "online_users": manager.get_room_users(room_id),
-            "timestamp":    datetime.now().isoformat(),
+            "timestamp":    get_utc_now_str(),
         },
         room_id,
     )
@@ -290,7 +304,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                     "sender_id":   user.id,
                     "sender_name": user_email,
                     "content":     user_message,
-                    "timestamp":   datetime.now().isoformat(),
+                    "timestamp":   get_utc_now_str(),
                 },
                 room_id,
             )
@@ -338,7 +352,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 {
                     "type":        "typing",
                     "sender_name": "AI Agents",
-                    "timestamp":   datetime.now().isoformat(),
+                    "timestamp":   get_utc_now_str(),
                 },
                 room_id,
             )
@@ -378,7 +392,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                     "content":         final_answer.strip(),
                     "mode_used":       mode_used,
                     "agent_responses": agent_responses,
-                    "timestamp":       datetime.now().isoformat(),
+                    "timestamp":       get_utc_now_str(),
                 },
                 room_id,
             )

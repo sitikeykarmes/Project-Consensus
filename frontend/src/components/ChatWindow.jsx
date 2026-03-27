@@ -3,7 +3,7 @@ import ChatHeader from "./ChatHeader";
 import MessageBubble from "./MessageBubble";
 import TypingIndicator from "./TypingIndicator";
 import ChatInput from "./ChatInput";
-import { getWsUrl } from "../api/chatApi";
+import { getWsUrl, markGroupRead } from "../api/chatApi";
 
 export default function ChatWindow({ group, user, onGroupDeleted }) {
   const [messages, setMessages] = useState([]);
@@ -32,6 +32,9 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
     const token = localStorage.getItem("token");
     if (!token) return;
 
+    // Automatically mark the current room as Read to suppress badges
+    markGroupRead(group.id, token);
+
     const userStr = localStorage.getItem("user");
     if (userStr) {
       const userData = JSON.parse(userStr);
@@ -52,11 +55,15 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
         return;
       }
 
-      if (msg.type === "consensus") setIsAiTyping(false);
-
       if (msg.type === "user_joined" || msg.type === "user_left") return;
 
+      if (msg.type === "consensus") {
+        setIsAiTyping(false);
+        if (!msg.historical) markGroupRead(group.id, token);
+      }
+
       if (msg.type === "user") {
+        if (!msg.historical) markGroupRead(group.id, token);
         setMessages((prev) => {
           const optimisticIndex = prev.findLastIndex(
             (m) => m._optimistic && m.content === msg.content,

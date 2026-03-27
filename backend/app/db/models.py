@@ -69,6 +69,7 @@ class GroupMember(Base):
     group_id = Column(String, ForeignKey("groups.id"), nullable=False)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     joined_at = Column(DateTime, default=datetime.utcnow)
+    last_read_at = Column(DateTime, default=datetime.utcnow)
 
     group = relationship("Group", back_populates="members")
     user = relationship("User", back_populates="memberships")

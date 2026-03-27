@@ -9,7 +9,10 @@ export async function fetchGroups(token) {
   });
 
   if (!res.ok) {
-    const err = await res.json();
+    if (res.status === 401) {
+      throw new Error("UNAUTHORIZED");
+    }
+    const err = await res.json().catch(() => ({}));
     console.error("Fetch Groups Error:", err);
     return { groups: [] };
   }
@@ -30,6 +33,16 @@ export async function createGroup(groupData) {
   });
 
   return res.json();
+}
+
+export async function markGroupRead(groupId, token) {
+  const res = await fetch(`${BASE_URL}/api/groups/${groupId}/read`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.ok;
 }
 
 export function getWsUrl(roomId, token) {

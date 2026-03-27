@@ -18,8 +18,8 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecretkey")
 # Algorithm
 ALGORITHM = "HS256"
 
-# Token expiry time
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+# Token expiry time (7 days instead of 60 minutes)
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 
 # --------------------------------------------------
