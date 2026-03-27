@@ -1,5 +1,6 @@
 // src/components/MessageBubble.jsx
 import { useState } from "react";
+import { motion } from "framer-motion";
 import {
   ChevronDown,
   ChevronUp,
@@ -36,7 +37,13 @@ function ConsensusMessage({ msg }) {
   const modeColor      = getModeColor(modeUsed);
 
   return (
-    <div data-testid="consensus-message" className="flex msg-enter">
+    <motion.div 
+      initial={{ opacity: 0, y: 15, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 24 }}
+      data-testid="consensus-message" 
+      className="flex msg-enter"
+    >
       <div
         className="w-full max-w-[75%] rounded-xl overflow-hidden consensus-glow"
         style={{
@@ -154,7 +161,7 @@ function ConsensusMessage({ msg }) {
           </>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -162,7 +169,10 @@ function UserMessage({ msg, isCurrentUser }) {
   const senderLabel = isCurrentUser ? "You" : msg.sender_name || "User";
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 15, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 24 }}
       className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} msg-enter`}
     >
       <div
@@ -204,13 +214,18 @@ function UserMessage({ msg, isCurrentUser }) {
           </p>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function SystemMessage({ msg }) {
   return (
-    <div className="flex justify-center msg-enter">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="flex justify-center msg-enter"
+    >
       <div
         data-testid="system-message"
         className="px-4 py-1.5 rounded-lg text-xs max-w-[70%]"
@@ -218,7 +233,7 @@ function SystemMessage({ msg }) {
       >
         {msg.content}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

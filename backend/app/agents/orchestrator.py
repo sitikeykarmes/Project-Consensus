@@ -20,7 +20,7 @@ class Orchestrator:
         context_str = self._build_context_str(conversation_history)
         return self.intent_classifier.should_invoke_ai(user_query, context_str)
 
-    def execute_query(self, user_query: str, conversation_history: list = None, mode_override: str = None, status_callback=None) -> dict:
+    def execute_query(self, user_query: str, conversation_history: list = None, mode_override: str = None, status_callback=None, stream_callback=None) -> dict:
         """Main orchestration logic with conversation context"""
         
         context_str = self._build_context_str(conversation_history)
@@ -45,7 +45,7 @@ class Orchestrator:
         # Step 3: Consensus synthesis
         if status_callback: status_callback("Synthesizing final consensus...")
         print("Synthesizing consensus...")
-        final_answer = self.synthesize_consensus(user_query, result, context_str, mode)
+        final_answer = self.synthesize_consensus(user_query, result, context_str, mode, stream_callback=stream_callback)
         print("Complete!")
         
         # Step 4: Evaluate synthesis quality — prints scorecard to terminal
@@ -80,8 +80,8 @@ class Orchestrator:
 
         return "\n".join(parts)
     
-    def synthesize_consensus(self, original_query: str, agent_results: dict, context_str: str = "", mode: str = "") -> str:
-        """Synthesize final consensus from agent responses using agent4 (qwen/qwen3-32b)"""
+    def synthesize_consensus(self, original_query: str, agent_results: dict, context_str: str = "", mode: str = "", stream_callback=None) -> str:
+        """Synthesize final consensus from agent responses using streaming token dispatch."""
         # To avoid Groq TPM limit errors on free tiers, truncate long Opposition mode logs
         # We only pass the FINAL round (last 4 messages) to the synthesis agent
         if mode == "opposition" and len(agent_results.get("responses", [])) > 5:
@@ -184,7 +184,12 @@ Now give the final answer:"""
             ]
 
             # agent5 = meta-llama/llama-4-scout-17b-16e-instruct (streaming internally, returns full string)
-            return self.consensus_client.get_completion("agent5", messages, max_tokens=4096)
+            return self.consensus_client.get_completion(
+                "agent5",
+                messages,
+                max_tokens=4096,
+                stream_callback=stream_callback
+            )
             
         except Exception as e:
             return f"Error in synthesis: {e}"

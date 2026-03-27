@@ -349,19 +349,33 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
 
             # Execute orchestrator with hybrid context
             loop = asyncio.get_running_loop()
+            
             def status_callback(msg_text: str):
                 try:
+                    # Generic status callback uses 'type': 'typing' 
+                    # We check if it's the stream event flag!
+                    # Wait, orchestrator execute_query passes status_callback to stream_callback
+                    # Let's route standard statuses vs raw stream chunks based on content
+                    payload = {
+                        "type":          "typing",
+                        "sender_name":   "AI Agents",
+                        "status_message": msg_text,
+                        "timestamp":     get_utc_now_str(),
+                    }
                     asyncio.run_coroutine_threadsafe(
-                        manager.broadcast_to_room(
-                            {
-                                "type":          "typing",
-                                "sender_name":   "AI Agents",
-                                "status_message": msg_text,
-                                "timestamp":     get_utc_now_str(),
-                            },
-                            room_id,
-                        ),
-                        loop
+                        manager.broadcast_to_room(payload, room_id), loop
+                    )
+                except Exception:
+                    pass
+
+            def stream_callback(token: str):
+                try:
+                    payload = {
+                        "type": "consensus_stream",
+                        "content": token
+                    }
+                    asyncio.run_coroutine_threadsafe(
+                        manager.broadcast_to_room(payload, room_id), loop
                     )
                 except Exception:
                     pass
@@ -370,7 +384,8 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 orchestrator.execute_query,
                 user_message,
                 conversation_history=conversation_history,
-                status_callback=status_callback
+                status_callback=status_callback,
+                stream_callback=stream_callback
             )
 
             agent_responses = result["agent_responses"]

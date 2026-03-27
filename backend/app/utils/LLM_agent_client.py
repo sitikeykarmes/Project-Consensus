@@ -59,6 +59,7 @@ class LLMAgentClient:
         messages: List[Dict],
         temperature: float = 0.7,
         max_tokens: int = 400,
+        stream_callback=None
     ) -> str:
         """
         Calls Groq chat completion safely.
@@ -78,10 +79,10 @@ class LLMAgentClient:
             return f"Error: Unknown model key '{model_key}'"
 
         # -----------------------------
-        # Route agent4 to streaming handler
+        # Route streaming models to streaming handler
         # -----------------------------
         if self.models[model_key].get("streaming"):
-            return self.get_streaming_completion(model_key, messages, max_tokens)
+            return self.get_streaming_completion(model_key, messages, max_tokens, stream_callback)
 
         model_name = self.models[model_key]["model"]
 
@@ -140,6 +141,7 @@ class LLMAgentClient:
         model_key: str,
         messages: List[Dict],
         max_tokens: int = 4096,
+        stream_callback=None
     ) -> str:
         """
         Handles streaming completions for agent4 (qwen/qwen3-32b).
@@ -166,12 +168,14 @@ class LLMAgentClient:
 
             completion = self.groq_client.chat.completions.create(**kwargs)
 
-            # Collect all streamed chunks into a single string
+            # Collect all streamed chunks into a single string AND dispatch to callback
             full_response = ""
             for chunk in completion:
                 delta = chunk.choices[0].delta.content
                 if delta:
                     full_response += delta
+                    if stream_callback:
+                        stream_callback(delta)
 
             if full_response and full_response.strip():
                 print(f"✅ {model_key} streaming completed successfully.")

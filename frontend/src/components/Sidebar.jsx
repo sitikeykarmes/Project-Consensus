@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { LogOut, Plus, MessageSquare, Search } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import CreateGroupModal from "./CreateGroupModal";
 
 export default function Sidebar({
@@ -111,12 +112,18 @@ export default function Sidebar({
       </div>
 
       {/* Group List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
         {filtered.length > 0 ? (
-          filtered.map((group) => {
+          <AnimatePresence initial={false}>
+            {filtered.map((group) => {
             const isActive = activeGroup?.id === group.id;
             return (
-              <div
+              <motion.div
+                layout
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 350, damping: 25 }}
                 key={group.id}
                 data-testid={`group-item-${group.id}`}
                 onClick={() => setActiveGroup(group)}
@@ -178,9 +185,10 @@ export default function Sidebar({
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
-          })
+          })}
+          </AnimatePresence>
         ) : (
           <div className="text-center mt-8 px-4">
             <MessageSquare

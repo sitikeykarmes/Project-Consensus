@@ -11,6 +11,7 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [typingStatus, setTypingStatus] = useState("AI is thinking...");
+  const [streamingMsg, setStreamingMsg] = useState(null);
 
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -63,8 +64,29 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
 
       if (msg.type === "user_joined" || msg.type === "user_left") return;
 
+      if (msg.type === "consensus_stream") {
+        setStreamingMsg((prev) => {
+          if (!prev) {
+            return {
+              type: "consensus",
+              sender_name: "Consensus Synthesis Agent",
+              content: msg.content,
+              timestamp: new Date().toISOString(),
+              agent_responses: [], // Kept blank until final consensus payload drops
+              _streaming: true
+            };
+          }
+          return {
+            ...prev,
+            content: prev.content + msg.content,
+          };
+        });
+        return;
+      }
+
       if (msg.type === "consensus") {
         setIsAiTyping(false);
+        setStreamingMsg(null); // Drop the active stream buffer 
         if (!msg.historical) markGroupRead(group.id, token);
       }
 
@@ -150,7 +172,8 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
         {messages.map((msg, i) => (
           <MessageBubble key={i} msg={msg} currentUserId={currentUserId} />
         ))}
-        {isAiTyping && <TypingIndicator status={typingStatus} />}
+        {streamingMsg && <MessageBubble msg={streamingMsg} currentUserId={currentUserId} />}
+        {isAiTyping && !streamingMsg && <TypingIndicator status={typingStatus} />}
         <div ref={messagesEndRef} />
       </div>
 
