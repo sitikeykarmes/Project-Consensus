@@ -1,4 +1,4 @@
-export default function TypingIndicator() {
+export default function TypingIndicator({ status = "AI is thinking..." }) {
   return (
     <div data-testid="typing-indicator" className="flex justify-start msg-enter">
       <div
@@ -19,7 +19,7 @@ export default function TypingIndicator() {
           <span className="typing-dot w-2 h-2 rounded-full inline-block" style={{ background: "#8696a0" }} />
           <span className="typing-dot w-2 h-2 rounded-full inline-block" style={{ background: "#8696a0" }} />
         </div>
-        <span className="text-xs ml-1" style={{ color: "#8696a0" }}>AI is thinking...</span>
+        <span className="text-xs ml-1" style={{ color: "#8696a0" }}>{status}</span>
       </div>
     </div>
   );

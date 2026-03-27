@@ -20,7 +20,7 @@ class Orchestrator:
         context_str = self._build_context_str(conversation_history)
         return self.intent_classifier.should_invoke_ai(user_query, context_str)
 
-    def execute_query(self, user_query: str, conversation_history: list = None, mode_override: str = None) -> dict:
+    def execute_query(self, user_query: str, conversation_history: list = None, mode_override: str = None, status_callback=None) -> dict:
         """Main orchestration logic with conversation context"""
         
         context_str = self._build_context_str(conversation_history)
@@ -29,19 +29,21 @@ class Orchestrator:
         if mode_override:
             mode = mode_override
         else:
+            if status_callback: status_callback("Classifying intent...")
             print("Classifying intent...")
             mode = self.intent_classifier.classify(user_query, context_str)
             print(f"Mode selected: {mode}")
         
         # Step 2: Execute appropriate mode
         if mode == "opposition":
-            result = self.opposition_mode.run(user_query, context_str)
+            result = self.opposition_mode.run(user_query, context_str, status_callback)
         elif mode == "support":
-            result = self.support_mode.run(user_query, context_str)
+            result = self.support_mode.run(user_query, context_str, status_callback)
         else:
-            result = self.independent_mode.run(user_query, context_str)
+            result = self.independent_mode.run(user_query, context_str, status_callback)
         
         # Step 3: Consensus synthesis
+        if status_callback: status_callback("Synthesizing final consensus...")
         print("Synthesizing consensus...")
         final_answer = self.synthesize_consensus(user_query, result, context_str, mode)
         print("Complete!")

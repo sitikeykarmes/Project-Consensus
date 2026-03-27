@@ -55,11 +55,17 @@ class IndependentMode:
         content = self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=1024)
         return {"agent_name": "Agent 3", "content": content, "mode": "independent"}
 
-    def run(self, user_query: str, context: str = "") -> dict:
+    def run(self, user_query: str, context: str = "", status_callback=None) -> dict:
         print("Running Independent Mode...")
-        results = [
-            self.agent_1(user_query, context),
-            self.agent_2(user_query, context),
-            self.agent_3(user_query, context),
-        ]
+        results = []
+        
+        if status_callback: status_callback("Agent 1 is generating a primary angle...")
+        results.append(self.agent_1(user_query, context))
+        
+        if status_callback: status_callback("Agent 2 is formulating an alternative viewpoint...")
+        results.append(self.agent_2(user_query, context))
+        
+        if status_callback: status_callback("Agent 3 is searching for missed nuances...")
+        results.append(self.agent_3(user_query, context))
+        
         return {"mode": "independent", "responses": results}

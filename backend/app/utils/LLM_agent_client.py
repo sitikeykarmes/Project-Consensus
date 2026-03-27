@@ -30,8 +30,7 @@ class LLMAgentClient:
             },
             "agent2": {
                 "provider": "groq",
-                "model": "qwen/qwen3-32b",
-                "reasoning_effort": "default",
+                "model": "llama-3.1-8b-instant",
             },
             "agent3": {
                 "provider": "groq",
@@ -115,9 +114,7 @@ class LLMAgentClient:
                 # ✅ If valid response, return immediately
                 if content and content.strip():
                     print(f"✅ {model_key} succeeded on attempt {attempt}")
-                    import re
-                    content = re.sub(r"<think>.*?(?:</think>|$)", "", content, flags=re.DOTALL).strip()
-                    return content
+                    return content.strip()
 
                 # ⚠️ Blank response → retry
                 print(
@@ -176,13 +173,9 @@ class LLMAgentClient:
                 if delta:
                     full_response += delta
 
-            # Strip Qwen's internal <think>...</think> reasoning block
-            import re
-            full_response = re.sub(r"<think>.*?(?:</think>|$)", "", full_response, flags=re.DOTALL).strip()
-
-            if full_response:
+            if full_response and full_response.strip():
                 print(f"✅ {model_key} streaming completed successfully.")
-                return full_response
+                return full_response.strip()
 
             print(f"❌ {model_key} returned blank streaming output.")
             return "⚠️ Agent did not respond properly. Please try again."

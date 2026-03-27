@@ -10,6 +10,7 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
   const [connected, setConnected] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [isAiTyping, setIsAiTyping] = useState(false);
+  const [typingStatus, setTypingStatus] = useState("AI is thinking...");
 
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -52,6 +53,11 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
 
       if (msg.type === "typing") {
         setIsAiTyping(true);
+        if (msg.status_message) {
+          setTypingStatus(msg.status_message);
+        } else {
+          setTypingStatus("AI is thinking...");
+        }
         return;
       }
 
@@ -144,7 +150,7 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
         {messages.map((msg, i) => (
           <MessageBubble key={i} msg={msg} currentUserId={currentUserId} />
         ))}
-        {isAiTyping && <TypingIndicator />}
+        {isAiTyping && <TypingIndicator status={typingStatus} />}
         <div ref={messagesEndRef} />
       </div>
 

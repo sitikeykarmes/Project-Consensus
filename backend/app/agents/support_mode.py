@@ -69,10 +69,16 @@ Add extra final useful points.
         ]
         return self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=1024)
 
-    def run(self, user_query: str, context: str = "") -> dict:
+    def run(self, user_query: str, context: str = "", status_callback=None) -> dict:
         print("Running Support Mode...")
+        
+        if status_callback: status_callback("Agent 1 is outlining the core answer...")
         lead = self.lead_agent(user_query, context)
+        
+        if status_callback: status_callback("Agent 2 is supplementing with extra nuance...")
         supplement = self.supplementer_agent(user_query, lead, context)
+        
+        if status_callback: status_callback("Agent 3 is reviewing for final missing points...")
         third = self.third_agent(user_query, lead + "\n" + supplement, context)
 
         return {

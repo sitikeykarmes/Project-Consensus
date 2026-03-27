@@ -97,11 +97,10 @@ Give a strictly factual investigation report.
         if context:
             context_block = f"\nPrevious conversation context:\n{context}\n"
             
-        round_instruction = ""
-        if round_no < 3:
-            round_instruction = f"This is only Round {round_no}. DO NOT declare 'VERDICT REACHED' yet. Instead, issue an interim judgment and instruct the Generator/Critic on what needs more debate."
+        if round_no < 5:
+            round_instruction = f"This is Round {round_no}. If the query is general, simple, or the Generator's answer is already fundamentally accurate and complete, you MUST declare 'VERDICT REACHED' immediately in this round. Do NOT artificially prolong the debate. Only if the query is highly complex or factually disputed should you issue an interim judgment and instruct further debate."
         else:
-            round_instruction = f"This is Round {round_no} (max 5). If the debate is settled, you MUST say: VERDICT REACHED. Otherwise, keep debating."
+            round_instruction = f"This is Round {round_no} (max 5). You MUST say: VERDICT REACHED."
             
         messages = [
             {
@@ -160,10 +159,11 @@ Now rewrite your answer.
         ]
         return self.client.get_completion("agent1", messages, temperature=0.6, max_tokens=100)
 
-    def run(self, user_query: str, context: str = "") -> dict:
+    def run(self, user_query: str, context: str = "", status_callback=None) -> dict:
         print("Running Opposition Mode Debate (Courtroom Model)...")
         responses = []
 
+        if status_callback: status_callback("Generator is formulating an initial response...")
         generator_text = self.generator_agent(user_query, context)
         responses.append({
             "agent_name": "Generator (Agent 1)",
@@ -172,6 +172,7 @@ Now rewrite your answer.
         })
 
         for round_no in range(1, 6):
+            if status_callback: status_callback(f"Round {round_no}: Critic is evaluating logic...")
             critic_text = self.critic_agent(user_query, generator_text, context)
             responses.append({
                 "agent_name": f"Critic (Agent 2) Round {round_no}",
@@ -179,6 +180,7 @@ Now rewrite your answer.
                 "mode": "opposition"
             })
 
+            if status_callback: status_callback(f"Round {round_no}: Investigator is fact-checking...")
             investigation_text = self.investigator_agent(user_query, generator_text, critic_text, context)
             responses.append({
                 "agent_name": f"Investigator (Agent 3) Round {round_no}",
@@ -186,6 +188,7 @@ Now rewrite your answer.
                 "mode": "opposition"
             })
 
+            if status_callback: status_callback(f"Round {round_no}: Chief Judge is rendering judgment...")
             judge_text = self.judge_agent(user_query, generator_text, critic_text, investigation_text, round_no, context)
             responses.append({
                 "agent_name": f"Chief Judge (Agent 4) Round {round_no}",
@@ -193,9 +196,10 @@ Now rewrite your answer.
                 "mode": "opposition"
             })
 
-            if round_no >= 3 and "verdict reached" in judge_text.lower():
+            if "verdict reached" in judge_text.lower():
                 break
 
+            if status_callback: status_callback(f"Round {round_no}: Generator is revising response...")
             generator_text = self.generator_update(user_query, judge_text, context)
             responses.append({
                 "agent_name": f"Generator Update Round {round_no}",

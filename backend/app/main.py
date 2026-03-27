@@ -347,21 +347,30 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 print(f"🛑 Gatekeeper blocked AI invocation for user message: '{user_message}'")
                 continue
 
-            # Typing indicator
-            await manager.broadcast_to_room(
-                {
-                    "type":        "typing",
-                    "sender_name": "AI Agents",
-                    "timestamp":   get_utc_now_str(),
-                },
-                room_id,
-            )
-
             # Execute orchestrator with hybrid context
+            loop = asyncio.get_running_loop()
+            def status_callback(msg_text: str):
+                try:
+                    asyncio.run_coroutine_threadsafe(
+                        manager.broadcast_to_room(
+                            {
+                                "type":          "typing",
+                                "sender_name":   "AI Agents",
+                                "status_message": msg_text,
+                                "timestamp":     get_utc_now_str(),
+                            },
+                            room_id,
+                        ),
+                        loop
+                    )
+                except Exception:
+                    pass
+
             result = await asyncio.to_thread(
                 orchestrator.execute_query,
                 user_message,
                 conversation_history=conversation_history,
+                status_callback=status_callback
             )
 
             agent_responses = result["agent_responses"]
