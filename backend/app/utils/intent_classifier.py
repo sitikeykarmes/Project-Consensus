@@ -47,7 +47,7 @@ Return EXACTLY ONE WORD: either YES or NO. Nothing else."""
 
             # We use an ultra-fast model or our default fast model for this gatekeeper
             response = self.client.chat.completions.create(
-                model="llama-3.1-8b-instant", # specifically designed for <100ms classification
+                model=self.model, # using versatile model due to 8b rate limits
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"{context_prefix}Decide if this LAST message needs AI generation: '{user_query}'"}
