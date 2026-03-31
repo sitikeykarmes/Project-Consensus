@@ -98,7 +98,7 @@ Give a strictly factual investigation report.
             context_block = f"\nPrevious conversation context:\n{context}\n"
             
         if round_no == 1:
-            round_instruction = f"This is Round 1. You MUST NOT reach a verdict yet. You MUST explicitly state 'CONTINUE DEBATE' and critique the Generator or Critic to dive deeper into the core dispute."
+            round_instruction = f"This is Round 1. If the user query is extremely simple or easily verifiable, you may declare 'VERDICT REACHED' immediately. However, if the query is EVEN SLIGHTLY complex, nuanced, or requires strategic trade-offs, you MUST NOT reach a verdict yet. You MUST explicitly state 'CONTINUE DEBATE', issue an interim judgment on the current arguments, and demand that the Critic/Generator dive deeper."
         elif round_no < 5:
             round_instruction = f"This is Round {round_no}. If the underlying truth is clear, you MUST declare 'VERDICT REACHED' immediately. Do NOT artificially prolong the debate. Only if it is highly complex should you instruct further debate."
         else:
