@@ -49,13 +49,14 @@ class Orchestrator:
         print("Complete!")
         
         # Step 4: Evaluate synthesis quality — prints scorecard to terminal
-        evaluate_synthesis(
-            user_query      = user_query,
-            agent_responses = result["responses"],
-            final_answer    = final_answer,
-            mode            = mode,
-            context_str     = context_str,
-        )
+        # (Disabled for production UI. Evaluation is handled purely out-of-band by evaluation_suite.py)
+        # evaluate_synthesis(
+        #     user_query      = user_query,
+        #     agent_responses = result["responses"],
+        #     final_answer    = final_answer,
+        #     mode            = mode,
+        #     context_str     = context_str,
+        # )
 
         return {
             "mode_used": mode,
