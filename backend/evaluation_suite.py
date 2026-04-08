@@ -14,43 +14,42 @@ from app.agents.orchestrator import Orchestrator
 import app.utils.Evaluator as legacy_eval
 import groq
 
-# --- TEST QUERIES (Placeholders for 30 Total) ---
 QUERIES = {
     "independent": [
-        "Compare React, Vue, and Angular for building a large-scale enterprise web application.",
-        "What are the trade-offs between microservices and monolithic architecture?",
-        "Compare supervised, unsupervised, and reinforcement learning paradigms.",
-        "What are the differences between SQL and NoSQL databases?",
-        "Compare AWS, Azure, and Google Cloud for a startup deployment.",
-        "What are the pros and cons of electric vehicles vs hybrid vs gasoline cars?",
-        "Compare Python, Java, and Go for backend development.",
-        "What are different investment strategies for a beginner with limited capital?",
-        "Compare Agile, Scrum, and Waterfall methodologies for software development.",
-        "What are the different approaches to weight loss — diet, exercise, intermittent fasting?",
+        "Compare quantum computing processing models versus classical computing architecture.",
+        "What are the trade-offs between vertical scaling and horizontal scaling in cloud infrastructure?",
+        "Compare the strategic differences between chess and Go.",
+        "What are the differences between Keynesian and Austrian economic theories?",
+        "Compare the long-term impacts of leasing versus buying commercial real estate.",
+        "What are the pros and cons of utilizing nuclear fusion compared to advanced geothermal energy?",
+        "Compare functional programming in Haskell with object-oriented programming in C++.",
+        "What are the different architectural approaches to designing a planetary rover?",
+        "Compare cognitive behavioral therapy with psychoanalysis for treating anxiety.",
+        "What are the alternative approaches to desalinating ocean water?",
     ],
     "support": [
-        "Explain how the attention mechanism in transformer models works.",
-        "How does the human immune system fight a viral infection?",
-        "Explain how blockchain achieves decentralization and immutability.",
-        "How does garbage collection work in modern programming languages?",
-        "Explain the theory of relativity in simple terms.",
-        "How does a compiler convert source code to machine code step by step?",
-        "Explain how HTTPS and SSL/TLS work to secure internet communication.",
-        "How does the water cycle work at a molecular and atmospheric level?",
-        "Explain how reinforcement learning trains an agent using rewards and penalties.",
-        "How does the stock market determine the price of a share?",
+        "Explain how CRISPR-Cas9 edits genetic sequences at a molecular level.",
+        "How do black holes warp spacetime according to general relativity?",
+        "Explain how a lithium-ion battery stores and releases electrical energy.",
+        "How does a CPU pipeline handle out-of-order execution?",
+        "Explain the biological mechanism behind human muscle hypertrophy.",
+        "How does the GPS system calculate a precise location on Earth?",
+        "Explain how a turbocharger increases engine horsepower.",
+        "How does the Federal Reserve use interest rates to control inflation?",
+        "Explain the cryptographic principles behind zero-knowledge proofs.",
+        "How does a hurricane form and gain energy over warm ocean waters?",
     ],
     "opposition": [
-        "Is it true that humans only use 10% of their brains?",
-        "Is social media doing more harm than good to society?",
-        "Should AI systems be held legally liable for harm caused by their outputs?",
-        "Is nuclear energy a safe and viable solution for climate change?",
-        "Is it true that eating fat makes you gain weight?",
-        "Does screen time actually damage children's cognitive development?",
-        "Is cryptocurrency a legitimate financial asset or a speculative bubble?",
-        "Should governments mandate algorithmic transparency in AI used for criminal sentencing?",
-        "Is remote work more productive than working from office?",
-        "Is it ethical to use animal subjects in medical research?",
+        "Is it true that stretching before a workout prevents injury?",
+        "Do artificial sweeteners cause significant disruptions to the human gut microbiome?",
+        "Is universal basic income a mathematically sustainable economic policy?",
+        "Does violent video game consumption lead to real-world aggression in adolescents?",
+        "Is it true that MSG is inherently harmful to human health?",
+        "Should human gene editing be permitted for non-therapeutic enhancements?",
+        "Is organic farming truly better for the environment than conventional methods?",
+        "Should voting be legally mandated for all eligible citizens in a democracy?",
+        "Is the deployment of autonomous weapons systems ethically justifiable?",
+        "Does the placebo effect have an actual physiological impact on the body?",
     ],
 }
 
@@ -142,7 +141,7 @@ def main():
             json.dump(reports, f, indent=4)
         print(f"Successfully generated metrics JSON at: {json_file}")
         
-        print("\nAll batch testing complete! The results are ready for your project report.")
+        print("\nAll batch testing complete! The results are ready for project report.")
 
 if __name__ == "__main__":
     main()

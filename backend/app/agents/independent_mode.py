@@ -54,7 +54,7 @@ class IndependentMode:
         )
         content = self.client.get_completion("agent3", messages, temperature=0.7, max_tokens=1024)
         return {"agent_name": "Agent 3", "content": content, "mode": "independent"}
-
+    #run
     def run(self, user_query: str, context: str = "", status_callback=None) -> dict:
         print("Running Independent Mode...")
         results = []
