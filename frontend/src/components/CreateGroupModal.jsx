@@ -1,36 +1,13 @@
-import { useEffect, useState } from "react";
-import { fetchAgents } from "../api/chatApi";
-import { X, Plus, Bot, Users, Mail } from "lucide-react";
+import { useState } from "react";
+import { X, Plus, Users, Mail } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export default function CreateGroupModal({ close, reloadGroups }) {
   const [name, setName] = useState("");
-  const [agents, setAgents] = useState([]);
-  const [selectedAgents, setSelectedAgents] = useState([]);
   const [memberEmail, setMemberEmail] = useState("");
   const [memberEmails, setMemberEmails] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    async function loadAgents() {
-      try {
-        const data = await fetchAgents();
-        setAgents(data.agents.filter(a => a.id !== "agent_orchestrator"));
-      } catch (err) {
-        console.error("Failed to load agents");
-      }
-    }
-    loadAgents();
-  }, []);
-
-  function toggleAgent(agentId) {
-    if (selectedAgents.includes(agentId)) {
-      setSelectedAgents(selectedAgents.filter((a) => a !== agentId));
-    } else {
-      setSelectedAgents([...selectedAgents, agentId]);
-    }
-  }
 
   function addMemberEmail() {
     const email = memberEmail.trim().toLowerCase();
@@ -79,7 +56,7 @@ export default function CreateGroupModal({ close, reloadGroups }) {
         },
         body: JSON.stringify({
           name: name,
-          agents: selectedAgents,
+          agents: ["all"],
           member_emails: memberEmails,
         }),
       });
@@ -150,46 +127,7 @@ export default function CreateGroupModal({ close, reloadGroups }) {
             />
           </div>
 
-          {/* Agent Selection */}
-          <div>
-            <label
-              className="text-xs font-medium mb-2 flex items-center gap-1.5"
-              style={{ color: "#8696a0" }}
-            >
-              <Bot size={14} /> Select AI Agents
-            </label>
-            <div className="space-y-2">
-              {agents.map((agent) => (
-                <label
-                  key={agent.id}
-                  data-testid={`agent-checkbox-${agent.id}`}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all"
-                  style={{
-                    background: selectedAgents.includes(agent.id)
-                      ? "rgba(0,168,132,0.1)"
-                      : "#2a3942",
-                    border: `1px solid ${selectedAgents.includes(agent.id) ? "#00a884" : "transparent"}`,
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedAgents.includes(agent.id)}
-                    onChange={() => toggleAgent(agent.id)}
-                    className="accent-[#00a884]"
-                  />
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ background: "#00a884", color: "#fff" }}
-                  >
-                    {agent.avatar || "AI"}
-                  </div>
-                  <span className="text-sm" style={{ color: "#e9edef" }}>
-                    {agent.name}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
+
 
           {/* Members */}
           <div>

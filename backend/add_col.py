@@ -8,7 +8,7 @@ from sqlalchemy import text
 
 try:
     with engine.connect() as conn:
-        conn.execute(text("ALTER TABLE group_members ADD COLUMN last_read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
+        conn.execute(text("ALTER TABLE group_members ADD COLUMN last_read_at TIMESTAMP"))
         conn.commit()
         print("Successfully added last_read_at to group_members")
 except Exception as e:
