@@ -34,7 +34,7 @@ class LLMAgentClient:
             },
             "agent3": {
                 "provider": "groq",
-                "model": "moonshotai/kimi-k2-instruct-0905",
+                "model": "llama-3.3-70b-versatile",
             },
             "agent4": {
                 "provider": "groq",

@@ -4,8 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./whatsapp_aidb.db")
-#DATABASE_URL = "sqlite:///./whatsapp_aidb.db"
+#DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./whatsapp_aidb.db")
+DATABASE_URL = "sqlite:///./whatsapp_aidb.db"
 
 # PostgreSQL needs pool settings; SQLite needs check_same_thread
 if DATABASE_URL.startswith("postgresql"):
