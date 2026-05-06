@@ -5,7 +5,7 @@ import TypingIndicator from "./TypingIndicator";
 import ChatInput from "./ChatInput";
 import { getWsUrl, markGroupRead } from "../api/chatApi";
 
-export default function ChatWindow({ group, user, onGroupDeleted }) {
+export default function ChatWindow({ group, user, onGroupDeleted, isSidebarOpen, setIsSidebarOpen }) {
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -148,33 +148,28 @@ export default function ChatWindow({ group, user, onGroupDeleted }) {
     <div
       data-testid="chat-window"
       className="flex-1 flex flex-col relative"
-      style={{ background: "#0b141a" }}
+      style={{ background: "linear-gradient(180deg, #20292d 0%, #141a1d 100%)" }}
     >
-      <div
-        className="absolute inset-0 opacity-[0.08] pointer-events-none"
-        style={{
-          backgroundImage:
-            "url('./bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png')",
-          backgroundRepeat: "repeat",
-        }}
-      />
-
       <ChatHeader
         group={group}
         connected={connected}
         onGroupDeleted={handleGroupDeleted}
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
       />
 
       <div
         data-testid="messages-container"
-        className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 space-y-2 relative z-10"
+        className="flex-1 overflow-y-auto py-6 relative z-10"
       >
-        {messages.map((msg, i) => (
-          <MessageBubble key={i} msg={msg} currentUserId={currentUserId} />
-        ))}
-        {streamingMsg && <MessageBubble msg={streamingMsg} currentUserId={currentUserId} />}
-        {isAiTyping && !streamingMsg && <TypingIndicator status={typingStatus} />}
-        <div ref={messagesEndRef} />
+        <div className="px-8 space-y-4">
+          {messages.map((msg, i) => (
+            <MessageBubble key={i} msg={msg} currentUserId={currentUserId} />
+          ))}
+          {streamingMsg && <MessageBubble msg={streamingMsg} currentUserId={currentUserId} />}
+          {isAiTyping && !streamingMsg && <TypingIndicator status={typingStatus} />}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       <ChatInput sendMessage={sendMessage} disabled={!connected} />

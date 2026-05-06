@@ -85,16 +85,21 @@ export default function AddMembersModal({ groupId, close, onMembersAdded }) {
   }
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center z-50" style={{ background: "rgba(0,0,0,0.6)" }}>
+    <div className="fixed inset-0 flex justify-center items-center z-50" style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}>
       <div
         data-testid="add-members-modal"
-        className="w-[440px] max-h-[85vh] overflow-y-auto rounded-xl shadow-2xl"
-        style={{ background: "#202c33", border: "1px solid #2a3942" }}
+        className="w-[440px] max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl"
+        style={{ 
+          background: "rgba(20, 20, 20, 0.85)", 
+          border: "1px solid rgba(255, 255, 255, 0.12)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)"
+        }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid #2a3942" }}>
-          <h2 className="text-base font-semibold" style={{ color: "#e9edef" }}>Add Members</h2>
-          <button onClick={close} className="p-1 rounded-lg" style={{ color: "#8696a0" }}>
+        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>Add Members</h2>
+          <button onClick={close} className="p-1 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.1)]" style={{ color: "var(--text-secondary)" }}>
             <X size={18} />
           </button>
         </div>
@@ -105,9 +110,9 @@ export default function AddMembersModal({ groupId, close, onMembersAdded }) {
             <input
               data-testid="add-member-email-input"
               type="email"
-              className="flex-1 px-4 py-2.5 rounded-lg text-sm focus:outline-none"
+              className="flex-1 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[var(--accent)] transition-all"
               placeholder="Enter member email..."
-              style={{ background: "#2a3942", color: "#e9edef" }}
+              style={{ background: "rgba(255,255,255,0.05)", color: "var(--text-primary)", border: "1px solid var(--border)" }}
               value={memberEmail}
               onChange={(e) => setMemberEmail(e.target.value)}
               onKeyDown={handleEmailKeyPress}
@@ -117,8 +122,8 @@ export default function AddMembersModal({ groupId, close, onMembersAdded }) {
               data-testid="add-email-btn"
               onClick={addMemberEmail}
               disabled={loading}
-              className="px-3 py-2 rounded-lg disabled:opacity-50"
-              style={{ background: "#00a884", color: "#fff" }}
+              className="px-3 py-2 rounded-lg transition-transform active:scale-95 disabled:opacity-50"
+              style={{ background: "var(--accent)", color: "var(--bg-app)" }}
             >
               <Plus size={18} />
             </button>
@@ -127,14 +132,14 @@ export default function AddMembersModal({ groupId, close, onMembersAdded }) {
           {/* Email Tags */}
           {memberEmails.length > 0 && (
             <div className="space-y-1.5 mb-4">
-              <p className="text-xs font-medium" style={{ color: "#8696a0" }}>Members to add:</p>
+              <p className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>Members to add:</p>
               {memberEmails.map((email) => (
-                <div key={email} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: "#2a3942" }}>
-                  <span className="text-xs flex items-center gap-1.5" style={{ color: "#e9edef" }}>
-                    <Mail size={12} style={{ color: "#8696a0" }} />
+                <div key={email} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)" }}>
+                  <span className="text-xs flex items-center gap-1.5" style={{ color: "var(--text-primary)" }}>
+                    <Mail size={12} style={{ color: "var(--text-secondary)" }} />
                     {email}
                   </span>
-                  <button onClick={() => removeMemberEmail(email)} disabled={loading} style={{ color: "#ef4444" }}>
+                  <button onClick={() => removeMemberEmail(email)} disabled={loading} className="transition-colors hover:text-red-400" style={{ color: "#ef4444" }}>
                     <X size={14} />
                   </button>
                 </div>
@@ -144,12 +149,12 @@ export default function AddMembersModal({ groupId, close, onMembersAdded }) {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-5 py-4" style={{ borderTop: "1px solid #2a3942" }}>
+        <div className="flex justify-end gap-3 px-5 py-4" style={{ borderTop: "1px solid var(--border)" }}>
           <button
             onClick={close}
             disabled={loading}
-            className="px-4 py-2 rounded-lg text-sm"
-            style={{ background: "#2a3942", color: "#8696a0" }}
+            className="px-4 py-2 rounded-lg text-sm transition-colors hover:bg-[rgba(255,255,255,0.1)]"
+            style={{ background: "transparent", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
           >
             Cancel
           </button>
@@ -157,8 +162,8 @@ export default function AddMembersModal({ groupId, close, onMembersAdded }) {
             data-testid="submit-add-members"
             onClick={handleAddMembers}
             disabled={loading || memberEmails.length === 0}
-            className="px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
-            style={{ background: "#00a884", color: "#fff" }}
+            className="px-5 py-2 rounded-lg text-sm font-medium transition-transform active:scale-95 disabled:opacity-50 disabled:scale-100"
+            style={{ background: "var(--accent)", color: "var(--bg-app)" }}
           >
             {loading ? "Adding..." : "Add Members"}
           </button>

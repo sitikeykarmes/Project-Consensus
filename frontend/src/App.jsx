@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import Login from "./pages/Login";
+import LandingPage from "./pages/LandingPage";
 import { fetchGroups } from "./api/chatApi.js";
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [groups, setGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -63,14 +66,15 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login setUser={setUser} />;
+    if (showLogin) return <Login setUser={setUser} />;
+    return <LandingPage onLoginClick={() => setShowLogin(true)} />;
   }
 
   return (
     <div
       data-testid="app-container"
       className="h-screen w-screen flex"
-      style={{ background: "#0b141a" }}
+      style={{ background: "var(--bg-app)", color: "var(--text-primary)" }}
     >
       <Sidebar
         groups={groups}
@@ -79,6 +83,8 @@ export default function App() {
         reloadGroups={loadGroups}
         user={user}
         logout={logout}
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
       />
 
       {activeGroup && user ? (
@@ -86,16 +92,18 @@ export default function App() {
           group={activeGroup}
           user={user}
           onGroupDeleted={handleGroupDeleted}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
         />
       ) : (
         <div
-          className="flex-1 flex flex-col items-center justify-center"
-          style={{ background: "#0b141a" }}
+          className="flex-1 flex flex-col items-center justify-center relative"
+          style={{ background: "var(--bg-app)" }}
         >
           <div className="text-center">
             <div
               className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-              style={{ background: "#202c33" }}
+              style={{ background: "var(--bg-header)", border: "1px solid var(--border)" }}
             >
               <svg
                 width="40"
@@ -110,11 +118,11 @@ export default function App() {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold" style={{ color: "#e9edef" }}>
-              AgentChat
+            <h3 className="text-xl font-bold tracking-wide" style={{ color: "var(--accent)" }}>
+              Project Consensus
             </h3>
-            <p className="text-sm mt-2" style={{ color: "#8696a0" }}>
-              Select a group to start chatting
+            <p className="text-sm mt-2" style={{ color: "var(--text-secondary)" }}>
+              Select a group to start collaborating
             </p>
           </div>
         </div>

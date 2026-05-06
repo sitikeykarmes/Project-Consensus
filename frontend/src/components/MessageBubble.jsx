@@ -23,10 +23,10 @@ function getModeLabel(mode) {
 function getModeColor(mode) {
   const colors = {
     independent: "#3b82f6",
-    support: "#00a884",
+    support: "var(--accent)",
     opposition: "#ef4444",
   };
-  return colors[mode] || "#8696a0";
+  return colors[mode] || "var(--text-secondary)";
 }
 
 function ConsensusMessage({ msg }) {
@@ -42,13 +42,15 @@ function ConsensusMessage({ msg }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
       data-testid="consensus-message" 
-      className="flex msg-enter"
+      className="flex justify-start msg-enter"
     >
       <div
-        className="w-full max-w-[75%] rounded-xl overflow-hidden consensus-glow"
+        className="w-full max-w-[65%] rounded-xl overflow-hidden consensus-glow"
         style={{
-          background: "#1f2c34",
-          border: "1px solid rgba(255,215,0,0.25)",
+          background: "var(--bg-consensus)",
+          border: "1px solid rgba(255, 255, 255, 0.12)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
         }}
       >
         {/* Mode Header */}
@@ -61,10 +63,10 @@ function ConsensusMessage({ msg }) {
               borderBottom: "1px solid rgba(255,215,0,0.15)",
             }}
           >
-            <Sparkles size={14} style={{ color: "#FFD700" }} />
+            <Sparkles size={14} style={{ color: "var(--accent)" }} />
             <span
               className="text-[11px] font-bold uppercase tracking-wider"
-              style={{ color: "#FFD700" }}
+              style={{ color: "var(--accent)" }}
             >
               AI Consensus
             </span>
@@ -87,7 +89,7 @@ function ConsensusMessage({ msg }) {
           {msg.timestamp && (
             <p
               className="text-[10px] mt-2 text-right"
-              style={{ color: "#8696a0" }}
+              style={{ color: "var(--text-secondary)" }}
             >
               {new Date(msg.timestamp).toLocaleTimeString([], {
                 hour:   "2-digit",
@@ -106,7 +108,7 @@ function ConsensusMessage({ msg }) {
               className="w-full py-2.5 flex items-center justify-center gap-2 transition-all cursor-pointer"
               style={{
                 background:  "rgba(17,27,33,0.6)",
-                color:       "#8696a0",
+                color:       "var(--text-secondary)",
                 borderTop:   "1px solid rgba(42,57,66,0.5)",
               }}
             >
@@ -134,8 +136,8 @@ function ConsensusMessage({ msg }) {
                     data-testid={`agent-response-${idx}`}
                     className="rounded-lg p-3"
                     style={{
-                      background: "#202c33",
-                      border:     "1px solid #2a3942",
+                      background: "var(--bg-agent-msg)",
+                      border:     "1px solid var(--border)",
                     }}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
@@ -147,7 +149,7 @@ function ConsensusMessage({ msg }) {
                       </div>
                       <span
                         className="text-xs font-semibold"
-                        style={{ color: "#e9edef" }}
+                        style={{ color: "var(--text-primary)" }}
                       >
                         {resp.agent_name || `Agent ${idx + 1}`}
                       </span>
@@ -177,18 +179,20 @@ function UserMessage({ msg, isCurrentUser }) {
     >
       <div
         data-testid={isCurrentUser ? "user-own-message" : "user-other-message"}
-        className="max-w-[65%] px-4 py-2 rounded-xl shadow-sm"
+        className="max-w-[70%] px-4 py-2 rounded-xl shadow-sm"
         style={{
-          background:           isCurrentUser ? "#005c4b" : "#202c33",
+          background:           isCurrentUser ? "var(--bg-user-msg)" : "var(--bg-agent-msg)",
+          backdropFilter:       "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
           borderTopRightRadius: isCurrentUser ? 0 : undefined,
           borderTopLeftRadius:  isCurrentUser ? undefined : 0,
-          border:               isCurrentUser ? "none" : "1px solid #2a3942",
+          border:               isCurrentUser ? "1px solid rgba(255, 255, 255, 0.15)" : "1px solid rgba(255, 255, 255, 0.08)",
         }}
       >
         {!isCurrentUser && (
           <p
             className="text-[11px] font-semibold mb-0.5"
-            style={{ color: "#00a884" }}
+            style={{ color: "var(--accent)" }}
           >
             {senderLabel}
           </p>
@@ -196,7 +200,7 @@ function UserMessage({ msg, isCurrentUser }) {
         {/* User messages stay as plain text — no markdown needed */}
         <p
           className="text-sm leading-relaxed whitespace-pre-line"
-          style={{ color: "#e9edef" }}
+          style={{ color: "var(--text-primary)" }}
         >
           {msg.content}
         </p>
@@ -204,7 +208,7 @@ function UserMessage({ msg, isCurrentUser }) {
           <p
             className="text-[10px] mt-1 text-right"
             style={{
-              color: isCurrentUser ? "rgba(255,255,255,0.5)" : "#8696a0",
+              color: isCurrentUser ? "rgba(255,255,255,0.5)" : "var(--text-secondary)",
             }}
           >
             {new Date(msg.timestamp).toLocaleTimeString([], {
@@ -229,7 +233,7 @@ function SystemMessage({ msg }) {
       <div
         data-testid="system-message"
         className="px-4 py-1.5 rounded-lg text-xs max-w-[70%]"
-        style={{ background: "rgba(42,57,66,0.5)", color: "#8696a0" }}
+        style={{ background: "rgba(42,57,66,0.5)", color: "var(--text-secondary)" }}
       >
         {msg.content}
       </div>

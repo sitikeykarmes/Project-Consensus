@@ -20,33 +20,40 @@ export default function ChatInput({ sendMessage, disabled }) {
   return (
     <div
       data-testid="chat-input-container"
-      className="px-4 py-3 flex items-center gap-3 relative z-10"
-      style={{ background: "#202c33" }}
+      className="px-4 pb-6 pt-2 flex items-center justify-center relative z-10 w-full"
+      style={{ background: "transparent" }}
     >
-      <input
-        data-testid="chat-message-input"
-        value={text}
-        disabled={disabled}
-        onChange={(e) => setText(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={disabled ? "Connecting..." : "Type a message..."}
-        className="flex-1 px-4 py-3 rounded-lg text-sm focus:outline-none focus:ring-1 transition-all"
-        style={{
-          background: "#2a3942",
-          color: "#e9edef",
-          border: "none",
+      <div 
+        className="flex items-center gap-2 w-full max-w-3xl p-1.5 rounded-3xl"
+        style={{ 
+          background: "var(--bg-input)", 
+          border: "1px solid var(--border)",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
         }}
-      />
-
-      <button
-        data-testid="send-message-button"
-        disabled={disabled || !text.trim()}
-        onClick={handleSend}
-        className="p-3 rounded-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-        style={{ background: "#00a884", color: "#fff" }}
       >
-        <Send size={18} />
-      </button>
+        <input
+          data-testid="chat-message-input"
+          value={text}
+          disabled={disabled}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={disabled ? "Connecting..." : "Message Consensus..."}
+          className="flex-1 px-4 py-2.5 bg-transparent text-sm focus:outline-none"
+          style={{
+            color: "var(--text-primary)",
+          }}
+        />
+
+        <button
+          data-testid="send-message-button"
+          disabled={disabled || !text.trim()}
+          onClick={handleSend}
+          className="w-9 h-9 rounded-full transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shrink-0 mr-1"
+          style={{ background: "var(--accent)", color: "var(--bg-app)" }}
+        >
+          <Send size={16} strokeWidth={2.5} style={{ marginLeft: "-2px" }} />
+        </button>
+      </div>
     </div>
   );
 }

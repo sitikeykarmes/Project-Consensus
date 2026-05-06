@@ -86,8 +86,7 @@ export default function Login({ setUser }) {
       data-testid="login-page"
       className="h-screen w-screen flex items-center justify-center"
       style={{
-        background:
-          "linear-gradient(135deg, #0b141a 0%, #111b21 50%, #0b141a 100%)",
+        background: "var(--bg-app)",
       }}
     >
       <div className="w-full max-w-[420px] mx-4">
@@ -95,14 +94,14 @@ export default function Login({ setUser }) {
         <div className="text-center mb-8">
           <div
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-            style={{ background: "#00a884" }}
+            style={{ background: "var(--accent)" }}
           >
-            <Zap size={32} color="#fff" />
+            <Bot size={32} color="#14100c" />
           </div>
-          <h1 className="text-2xl font-bold" style={{ color: "#e9edef" }}>
-            Consensus
+          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+            Project Consensus
           </h1>
-          <p className="text-sm mt-1" style={{ color: "#8696a0" }}>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
             Multi-Agent AI Collaboration
           </p>
         </div>
@@ -110,11 +109,11 @@ export default function Login({ setUser }) {
         {/* Card */}
         <div
           className="rounded-2xl p-8 shadow-2xl"
-          style={{ background: "#202c33", border: "1px solid #2a3942" }}
+          style={{ background: "var(--bg-header)", border: "1px solid var(--border)" }}
         >
           <h2
             className="text-lg font-semibold mb-6"
-            style={{ color: "#e9edef" }}
+            style={{ color: "var(--text-primary)" }}
           >
             {isSignup ? "Create Account" : "Welcome Back"}
           </h2>
@@ -138,7 +137,7 @@ export default function Login({ setUser }) {
               <Mail
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2"
-                style={{ color: "#8696a0" }}
+                style={{ color: "var(--text-secondary)" }}
               />
               <input
                 data-testid="login-email-input"
@@ -146,10 +145,10 @@ export default function Login({ setUser }) {
                 placeholder="Email address"
                 className="w-full pl-10 pr-4 py-3 rounded-lg text-sm focus:outline-none focus:ring-2 transition-all"
                 style={{
-                  background: "#2a3942",
-                  color: "#e9edef",
-                  border: "1px solid #2a3942",
-                  focusRingColor: "#00a884",
+                  background: "var(--bg-app)",
+                  color: "var(--text-primary)",
+                  border: "1px solid var(--border)",
+                  focusRingColor: "var(--accent)",
                 }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -161,7 +160,7 @@ export default function Login({ setUser }) {
               <Lock
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2"
-                style={{ color: "#8696a0" }}
+                style={{ color: "var(--text-secondary)" }}
               />
               <input
                 data-testid="login-password-input"
@@ -169,9 +168,9 @@ export default function Login({ setUser }) {
                 placeholder="Password"
                 className="w-full pl-10 pr-4 py-3 rounded-lg text-sm focus:outline-none focus:ring-2 transition-all"
                 style={{
-                  background: "#2a3942",
-                  color: "#e9edef",
-                  border: "1px solid #2a3942",
+                  background: "var(--bg-app)",
+                  color: "var(--text-primary)",
+                  border: "1px solid var(--border)",
                 }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -184,7 +183,7 @@ export default function Login({ setUser }) {
               onClick={isSignup ? handleSignup : handleLogin}
               disabled={loading}
               className="w-full py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60"
-              style={{ background: "#00a884", color: "#fff" }}
+              style={{ background: "var(--accent)", color: "#14100c" }}
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -204,8 +203,8 @@ export default function Login({ setUser }) {
                 setIsSignup(!isSignup);
                 setError("");
               }}
-              className="text-sm transition-colors"
-              style={{ color: "#00a884" }}
+              className="text-sm transition-colors hover:underline"
+              style={{ color: "var(--accent)" }}
             >
               {isSignup
                 ? "Already have an account? Log in"
@@ -224,9 +223,9 @@ export default function Login({ setUser }) {
             <div
               key={label}
               className="flex items-center gap-1.5 text-xs"
-              style={{ color: "#8696a0" }}
+              style={{ color: "var(--text-secondary)" }}
             >
-              <Icon size={14} style={{ color: "#00a884" }} />
+              <Icon size={14} style={{ color: "var(--accent)" }} />
               {label}
             </div>
           ))}

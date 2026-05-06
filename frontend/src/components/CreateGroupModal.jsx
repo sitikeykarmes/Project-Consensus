@@ -80,25 +80,30 @@ export default function CreateGroupModal({ close, reloadGroups }) {
   return (
     <div
       className="fixed inset-0 flex justify-center items-center z-50"
-      style={{ background: "rgba(0,0,0,0.6)" }}
+      style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
     >
       <div
         data-testid="create-group-modal"
-        className="w-[480px] max-h-[85vh] overflow-y-auto rounded-xl shadow-2xl"
-        style={{ background: "#202c33", border: "1px solid #2a3942" }}
+        className="w-[480px] max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl"
+        style={{ 
+          background: "rgba(20, 20, 20, 0.85)", 
+          border: "1px solid rgba(255, 255, 255, 0.12)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)"
+        }}
       >
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 py-4"
-          style={{ borderBottom: "1px solid #2a3942" }}
+          style={{ borderBottom: "1px solid var(--border)" }}
         >
-          <h2 className="text-base font-semibold" style={{ color: "#e9edef" }}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
             Create New Group
           </h2>
           <button
             onClick={close}
-            className="p-1 rounded-lg"
-            style={{ color: "#8696a0" }}
+            className="p-1 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.1)]"
+            style={{ color: "var(--text-secondary)" }}
           >
             <X size={18} />
           </button>
@@ -109,18 +114,18 @@ export default function CreateGroupModal({ close, reloadGroups }) {
           <div>
             <label
               className="text-xs font-medium mb-1.5 block"
-              style={{ color: "#8696a0" }}
+              style={{ color: "var(--text-secondary)" }}
             >
               Group Name
             </label>
             <input
               data-testid="group-name-input"
-              className="w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-1"
+              className="w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[var(--accent)] transition-all"
               placeholder="Enter group name..."
               style={{
-                background: "#2a3942",
-                color: "#e9edef",
-                border: "none",
+                background: "rgba(255,255,255,0.05)",
+                color: "var(--text-primary)",
+                border: "1px solid var(--border)",
               }}
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -133,7 +138,7 @@ export default function CreateGroupModal({ close, reloadGroups }) {
           <div>
             <label
               className="text-xs font-medium mb-2 flex items-center gap-1.5"
-              style={{ color: "#8696a0" }}
+              style={{ color: "var(--text-secondary)" }}
             >
               <Users size={14} /> Invite Members (Optional)
             </label>
@@ -141,9 +146,13 @@ export default function CreateGroupModal({ close, reloadGroups }) {
               <input
                 data-testid="member-email-input"
                 type="email"
-                className="flex-1 px-4 py-2.5 rounded-lg text-sm focus:outline-none"
+                className="flex-1 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[var(--accent)] transition-all"
                 placeholder="Enter email..."
-                style={{ background: "#2a3942", color: "#e9edef" }}
+                style={{ 
+                  background: "rgba(255,255,255,0.05)", 
+                  color: "var(--text-primary)",
+                  border: "1px solid var(--border)"
+                }}
                 value={memberEmail}
                 onChange={(e) => setMemberEmail(e.target.value)}
                 onKeyDown={handleEmailKeyPress}
@@ -151,8 +160,8 @@ export default function CreateGroupModal({ close, reloadGroups }) {
               <button
                 data-testid="add-member-email-button"
                 onClick={addMemberEmail}
-                className="px-3 py-2 rounded-lg"
-                style={{ background: "#00a884", color: "#fff" }}
+                className="px-3 py-2 rounded-lg transition-transform active:scale-95"
+                style={{ background: "var(--accent)", color: "var(--bg-app)" }}
               >
                 <Plus size={18} />
               </button>
@@ -163,17 +172,18 @@ export default function CreateGroupModal({ close, reloadGroups }) {
                   <div
                     key={email}
                     className="flex items-center justify-between px-3 py-2 rounded-lg"
-                    style={{ background: "#2a3942" }}
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)" }}
                   >
                     <span
                       className="text-xs flex items-center gap-1.5"
-                      style={{ color: "#e9edef" }}
+                      style={{ color: "var(--text-primary)" }}
                     >
-                      <Mail size={12} style={{ color: "#8696a0" }} />
+                      <Mail size={12} style={{ color: "var(--text-secondary)" }} />
                       {email}
                     </span>
                     <button
                       onClick={() => removeMemberEmail(email)}
+                      className="transition-colors hover:text-red-400"
                       style={{ color: "#ef4444" }}
                     >
                       <X size={14} />
@@ -188,13 +198,13 @@ export default function CreateGroupModal({ close, reloadGroups }) {
         {/* Footer */}
         <div
           className="flex justify-end gap-3 px-5 py-4"
-          style={{ borderTop: "1px solid #2a3942" }}
+          style={{ borderTop: "1px solid var(--border)" }}
         >
           <button
             data-testid="cancel-create-group"
             onClick={close}
-            className="px-4 py-2 rounded-lg text-sm"
-            style={{ background: "#2a3942", color: "#8696a0" }}
+            className="px-4 py-2 rounded-lg text-sm transition-colors hover:bg-[rgba(255,255,255,0.1)]"
+            style={{ background: "transparent", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
           >
             Cancel
           </button>
@@ -202,8 +212,8 @@ export default function CreateGroupModal({ close, reloadGroups }) {
             data-testid="submit-create-group"
             onClick={handleCreate}
             disabled={loading || !name.trim()}
-            className="px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
-            style={{ background: "#00a884", color: "#fff" }}
+            className="px-5 py-2 rounded-lg text-sm font-medium transition-transform active:scale-95 disabled:opacity-50 disabled:scale-100"
+            style={{ background: "var(--accent)", color: "var(--bg-app)" }}
           >
             {loading ? "Creating..." : "Create Group"}
           </button>

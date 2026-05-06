@@ -1,27 +1,27 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap");
 
 @import "tailwindcss";
 
 :root {
-  --bg-app: #0b141a;
-  --bg-sidebar: #111b21;
-  --bg-chat: #0b141a;
-  --bg-header: #202c33;
-  --bg-input: #202c33;
-  --bg-user-msg: #005c4b;
-  --bg-agent-msg: #202c33;
-  --bg-consensus: #1f2c34;
-  --text-primary: #e9edef;
-  --text-secondary: #8696a0;
-  --accent: #00a884;
-  --accent-hover: #008f6f;
-  --gold: #ffd700;
-  --border: #2a3942;
-  --border-highlight: #00a884;
+  --bg-app: #141414;
+  --bg-sidebar: #1a1a1a;
+  --bg-chat: #20292d;
+  --bg-header: #1e1e1e;
+  --bg-input: #1e1e1e;
+  --bg-user-msg: rgba(255, 255, 255, 0.10);
+  --bg-agent-msg: rgba(255, 255, 255, 0.06);
+  --bg-consensus: rgba(255, 255, 255, 0.08);
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --accent: #7a9fc4;
+  --accent-hover: #90b4d4;
+  --gold: #90b4d4;
+  --border: #2e2e2e;
+  --border-highlight: #7a9fc4;
 }
 
 body {
-  font-family: "DM Sans", system-ui, sans-serif;
+  font-family: "Mona Sans", system-ui, sans-serif;
   background: var(--bg-app);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;

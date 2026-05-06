@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
+import { Copy, Check } from "lucide-react";
 
 // ── Copy Button ───────────────────────────────────────────────────────────────
 function CopyButton({ text }) {
@@ -30,20 +31,17 @@ function CopyButton({ text }) {
   return (
     <button
       onClick={handleCopy}
+      className="flex items-center justify-center transition-colors"
       style={{
-        background: copied ? "#22c55e" : "#3f3f46",
-        color: "#fff",
+        background: "transparent",
+        color: copied ? "var(--accent)" : "var(--text-secondary)",
         border: "none",
-        borderRadius: "5px",
-        padding: "3px 10px",
-        fontSize: "11px",
+        padding: "4px",
         cursor: "pointer",
-        transition: "background 0.2s",
-        fontFamily: "sans-serif",
-        whiteSpace: "nowrap",
       }}
+      title={copied ? "Copied!" : "Copy code"}
     >
-      {copied ? "✓ Copied" : "Copy"}
+      {copied ? <Check size={16} /> : <Copy size={16} />}
     </button>
   );
 }

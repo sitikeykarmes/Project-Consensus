@@ -51,7 +51,7 @@ function DeleteGroupModal({ group, onConfirm, onClose, loading }) {
     >
       <div
         className="w-full max-w-sm rounded-2xl p-6 mx-4"
-        style={{ background: "#1f2c34", border: "1px solid #2a3942" }}
+        style={{ background: "#1f2c34", border: "1px solid var(--border)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-center mb-4">
@@ -64,13 +64,13 @@ function DeleteGroupModal({ group, onConfirm, onClose, loading }) {
         </div>
         <h2
           className="text-center text-base font-semibold mb-1"
-          style={{ color: "#e9edef" }}
+          style={{ color: "var(--text-primary)" }}
         >
           Delete "{group.name}"?
         </h2>
         <p
           className="text-center text-xs mb-6 leading-relaxed"
-          style={{ color: "#8696a0" }}
+          style={{ color: "var(--text-secondary)" }}
         >
           This will permanently delete the group, all messages, and conversation
           history. This action cannot be undone.
@@ -79,7 +79,7 @@ function DeleteGroupModal({ group, onConfirm, onClose, loading }) {
           <button
             onClick={onClose}
             className="flex-1 py-2.5 rounded-xl text-sm font-medium"
-            style={{ background: "#2a3942", color: "#8696a0" }}
+            style={{ background: "var(--border)", color: "var(--text-secondary)" }}
           >
             Cancel
           </button>
@@ -87,7 +87,7 @@ function DeleteGroupModal({ group, onConfirm, onClose, loading }) {
             onClick={onConfirm}
             disabled={loading}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
-            style={{ background: "#ef4444", color: "#fff" }}
+            style={{ background: "#ef4444", color: "var(--accent)" }}
           >
             {loading ? "Deleting…" : "Delete Group"}
           </button>
@@ -109,8 +109,8 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
       <div
         className="h-full w-80 flex flex-col overflow-hidden"
         style={{
-          background: "#0b141a",
-          borderLeft: "1px solid #2a3942",
+          background: "var(--bg-app)",
+          borderLeft: "1px solid var(--border)",
           animation: "slideInRight 0.2s ease-out",
         }}
         onClick={(e) => e.stopPropagation()}
@@ -118,12 +118,12 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 py-4 shrink-0"
-          style={{ background: "#202c33", borderBottom: "1px solid #2a3942" }}
+          style={{ background: "var(--bg-header)", borderBottom: "1px solid var(--border)" }}
         >
-          <span className="text-sm font-semibold" style={{ color: "#e9edef" }}>
+          <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
             Group Info
           </span>
-          <button onClick={onClose} style={{ color: "#8696a0" }}>
+          <button onClick={onClose} style={{ color: "var(--text-secondary)" }}>
             <X size={18} />
           </button>
         </div>
@@ -132,18 +132,18 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
           {/* Group Identity */}
           <div
             className="flex flex-col items-center py-8 px-5"
-            style={{ borderBottom: "1px solid #2a3942" }}
+            style={{ borderBottom: "1px solid var(--border)" }}
           >
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold mb-3"
-              style={{ background: "#2a3942", color: "#e9edef" }}
+              style={{ background: "var(--border)", color: "var(--text-primary)" }}
             >
               {group.name?.slice(0, 2).toUpperCase() || "GC"}
             </div>
-            <p className="text-base font-semibold" style={{ color: "#e9edef" }}>
+            <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
               {group.name}
             </p>
-            <p className="text-xs mt-1" style={{ color: "#8696a0" }}>
+            <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
               {members.length} member{members.length !== 1 ? "s" : ""} ·{" "}
               {agents.length} agent{agents.length !== 1 ? "s" : ""}
             </p>
@@ -152,26 +152,26 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
           {/* Agents */}
           <div
             className="px-5 py-4"
-            style={{ borderBottom: "1px solid #2a3942" }}
+            style={{ borderBottom: "1px solid var(--border)" }}
           >
             <div className="flex items-center gap-2 mb-3">
-              <Bot size={14} style={{ color: "#00a884" }} />
+              <Bot size={14} style={{ color: "var(--accent)" }} />
               <span
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: "#00a884" }}
+                style={{ color: "var(--accent)" }}
               >
                 AI Agents
               </span>
             </div>
             <div className="space-y-2">
               {agents.length === 0 && (
-                <p className="text-xs" style={{ color: "#8696a0" }}>
+                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
                   No agents in this group
                 </p>
               )}
               {agents.map((agentId, idx) => {
                 const style = AGENT_STYLES[agentId] || {
-                  color: "#8696a0",
+                  color: "var(--text-secondary)",
                   label: `Agent ${idx + 1}`,
                   role: "Agent",
                 };
@@ -193,17 +193,17 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
                     <div>
                       <p
                         className="text-xs font-semibold"
-                        style={{ color: "#e9edef" }}
+                        style={{ color: "var(--text-primary)" }}
                       >
                         {style.label}
                       </p>
-                      <p className="text-[10px]" style={{ color: "#8696a0" }}>
+                      <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>
                         {style.role}
                       </p>
                     </div>
                     <div
                       className="w-2 h-2 rounded-full ml-auto"
-                      style={{ background: "#00a884" }}
+                      style={{ background: "var(--accent)" }}
                     />
                   </div>
                 );
@@ -234,7 +234,7 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
                 >
                   Consensus Synthesis Agent
                 </p>
-                <p className="text-[10px]" style={{ color: "#8696a0" }}>
+                <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>
                   {AGENT_STYLES.agent_orchestrator.role}
                 </p>
               </div>
@@ -244,20 +244,20 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
           {/* Members */}
           <div
             className="px-5 py-4"
-            style={{ borderBottom: "1px solid #2a3942" }}
+            style={{ borderBottom: "1px solid var(--border)" }}
           >
             <div className="flex items-center gap-2 mb-3">
-              <Users size={14} style={{ color: "#8696a0" }} />
+              <Users size={14} style={{ color: "var(--text-secondary)" }} />
               <span
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: "#8696a0" }}
+                style={{ color: "var(--text-secondary)" }}
               >
                 Members ({members.length})
               </span>
             </div>
             <div className="space-y-1">
               {members.length === 0 && (
-                <p className="text-xs" style={{ color: "#8696a0" }}>
+                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
                   No members yet
                 </p>
               )}
@@ -269,13 +269,13 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
                 >
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                    style={{ background: "#2a3942", color: "#8696a0" }}
+                    style={{ background: "var(--border)", color: "var(--text-secondary)" }}
                   >
                     {member.email?.[0]?.toUpperCase() || "U"}
                   </div>
                   <p
                     className="text-xs font-medium truncate"
-                    style={{ color: "#e9edef" }}
+                    style={{ color: "var(--text-primary)" }}
                   >
                     {member.email}
                   </p>
@@ -288,7 +288,7 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
         {/* Delete button */}
         <div
           className="px-5 py-4 shrink-0"
-          style={{ borderTop: "1px solid #2a3942" }}
+          style={{ borderTop: "1px solid var(--border)" }}
         >
           <button
             onClick={onDeleteClick}
@@ -315,7 +315,7 @@ function GroupInfoPanel({ group, members, onClose, onDeleteClick }) {
   );
 }
 
-export default function ChatHeader({ group, connected, onGroupDeleted }) {
+export default function ChatHeader({ group, connected, onGroupDeleted, isSidebarOpen, setIsSidebarOpen }) {
   const [showAddMembers, setShowAddMembers] = useState(false);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -382,29 +382,30 @@ export default function ChatHeader({ group, connected, onGroupDeleted }) {
       <div
         data-testid="chat-header"
         className="h-14 px-4 flex items-center justify-between shrink-0 relative z-10"
-        style={{ background: "#202c33", borderBottom: "1px solid #2a3942" }}
+        style={{ background: "var(--bg-header)", borderBottom: "1px solid var(--border)" }}
       >
-        <button
-          className="flex items-center gap-3 rounded-lg px-1 py-1"
-          onClick={() => setShowInfoPanel(true)}
-          title="View group info"
-        >
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-            style={{ background: "#6a7175", color: "#fff" }}
+        <div className="flex items-center gap-3">
+          <button
+            className="flex items-center gap-3 rounded-lg px-1 py-1"
+            onClick={() => setShowInfoPanel(true)}
+            title="View group info"
           >
-            {getInitials(group.name)}
-          </div>
-          <div className="text-left">
-            <div className="flex items-center gap-1">
-              <p className="text-sm font-semibold" style={{ color: "#e9edef" }}>
-                {group.name}
-              </p>
-              <ChevronDown size={13} style={{ color: "#8696a0" }} />
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+              style={{ background: "var(--bg-app)", color: "var(--accent)", border: "1px solid var(--border-highlight)" }}
+            >
+              {getInitials(group.name)}
             </div>
+            <div className="text-left">
+              <div className="flex items-center gap-1">
+                <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  {group.name}
+                </p>
+                <ChevronDown size={13} style={{ color: "var(--text-secondary)" }} />
+              </div>
             <div
               className="flex items-center gap-3 text-[11px]"
-              style={{ color: "#8696a0" }}
+              style={{ color: "var(--text-secondary)" }}
             >
               <span className="flex items-center gap-1">
                 <Bot size={11} /> {(group.agents || []).filter(a => a !== "agent_orchestrator").length} agents
@@ -415,8 +416,8 @@ export default function ChatHeader({ group, connected, onGroupDeleted }) {
               <span className="flex items-center gap-1">
                 {connected ? (
                   <>
-                    <Wifi size={11} style={{ color: "#00a884" }} />
-                    <span style={{ color: "#00a884" }}>Online</span>
+                    <Wifi size={11} style={{ color: "var(--accent)" }} />
+                    <span style={{ color: "var(--accent)" }}>Online</span>
                   </>
                 ) : (
                   <>
@@ -428,15 +429,16 @@ export default function ChatHeader({ group, connected, onGroupDeleted }) {
             </div>
           </div>
         </button>
+        </div>
 
         <button
           data-testid="add-members-button"
           onClick={() => setShowAddMembers(true)}
           className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium"
           style={{
-            background: "#2a3942",
-            color: "#8696a0",
-            border: "1px solid #2a3942",
+            background: "var(--border)",
+            color: "var(--text-secondary)",
+            border: "1px solid var(--border)",
           }}
         >
           <UserPlus size={15} />
